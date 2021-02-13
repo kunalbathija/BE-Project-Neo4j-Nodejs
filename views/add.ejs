@@ -24,11 +24,16 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
       <div class="navbar-nav">
-        <a class="nav-item nav-link" href="/">Home </a>
+        <a class="nav-item nav-link" href="/">Home</a>
         <a class="nav-item nav-link active" href="/add">Allocate Funds <span class="sr-only">(current)</span></a>
-        <a class="nav-item nav-link" href="/graph">Fund Flow</a>
+        <a class="nav-item nav-link" href="/graph">Fund Tracking</a>
       </div>
     </div>
+    <ul class="nav navbar-nav ml-auto">
+        <form class="form-inline" action="/logout?_method=DELETE" method="POST">
+            <button class="btn btn-outline-danger" type="submit">Logout</button>
+          </form>
+    </ul>
 </nav>
 
 <div style="margin: 2.5%;">
