@@ -1,0 +1,637 @@
+/*
+* Copyright (C) 2014-2018 Frederic Ciminera
+*
+* Popoto.js is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* Popoto.js is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. If not, see <http://www.gnu.org/licenses/>.
+*
+* contact@popotojs.com
+*/
+
+.ppt-svg-graph {
+    cursor: move;
+    min-height: 100px;
+    width: 100%;
+    height: 100%;
+    pointer-events: all;
+}
+
+/******************************************************/
+/******************Link Styles*************************/
+.ppt-glink {
+    /*NA*/
+}
+
+.ppt-link {
+    /*NA*/
+}
+
+/***********************************************/
+/* generated with getCSSClass in link provider */
+
+/* Text on relation links */
+
+.ppt-link__text--relation {
+    cursor: pointer;
+}
+
+.ppt-link__text--hover--relation {
+    cursor: pointer;
+    fill: #ee4e10;
+}
+
+.ppt-link__text--relation--disabled {
+    cursor: pointer;
+    fill: #525863;
+}
+
+.ppt-link__text--hover--relation--disabled {
+    cursor: pointer;
+    fill: #ee4e10;
+}
+
+/* Text on value links */
+
+.ppt-link__text--value {
+    /*use base color*/
+}
+
+.ppt-link__text--hover--value {
+    fill: #f0b017;
+}
+
+/* Path for relation between nodes */
+
+.ppt-link__path--relation {
+    cursor: pointer;
+}
+
+.ppt-link__path--hover--relation {
+    cursor: pointer;
+    stroke: #ee4e10;
+    stroke-width: 2px;
+    marker-mid: url("#cross");
+}
+
+.ppt-link__path--relation--disabled {
+    cursor: pointer;
+    stroke-dasharray: 9, 5;
+    stroke-width: 2px;
+    stroke: #c9cacb;
+    opacity: 0.5;
+}
+
+.ppt-link__path--hover--relation--disabled {
+    cursor: pointer;
+    stroke: #ee4e10;
+    stroke-width: 2px;
+    marker-mid: url("#cross");
+}
+
+/* Path for relation with value nodes */
+
+.ppt-link__path--value {
+    fill: #f0b017;
+}
+
+.ppt-link__path--hover--value {
+    stroke: #f0b017;
+}
+
+/***********************************************/
+/* Markers styles */
+
+.ppt-marker-cross {
+    fill: transparent;
+    stroke: #ee4e10;
+    stroke-dasharray: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+}
+
+.ppt-marker-arrow {
+    fill: #ee4e10;
+}
+
+.ppt-marker-reverse-arrow {
+    fill: #ee4e10;
+}
+
+/******************************************************/
+/******************Node Styles*************************/
+
+/* tooltip set as title attribute */
+.ppt-node__title {
+
+}
+
+/* text displayed on nodes */
+.ppt-node__text--root {
+    fill: #ffffff;
+}
+
+.ppt-node__text--choose {
+    fill: #ffffff;
+}
+
+.ppt-node__text--group {
+    fill: #ffffff;
+}
+
+.ppt-node__text--value {
+    fill: #ffffff;
+}
+
+.ppt-node__text--root--disabled {
+    fill: #ffffff;
+}
+
+.ppt-node__text--root--value-selected {
+    fill: #ffffff;
+}
+
+.ppt-node__text--root--value-selected--disabled {
+    fill: #ffffff;
+}
+
+.ppt-node__text--choose--disabled {
+    fill: #ffffff;
+}
+
+.ppt-node__text--choose--value-selected {
+    fill: #ffffff;
+}
+
+.ppt-node__text--choose--value-selected--disabled {
+    fill: #ffffff;
+}
+
+.ppt-node__back-text--root {
+    fill-opacity: 0.8;
+}
+
+.ppt-node__back-text--choose {
+    fill-opacity: 0.8;
+}
+
+.ppt-node__back-text--value {
+    fill-opacity: 0.8;
+}
+
+.ppt-node__back-text--group {
+    fill-opacity: 0.8;
+}
+
+.ppt-node__back-text--choose--value-selected {
+    fill-opacity: 0.8;
+}
+
+.ppt-node__back-text--root--value-selected {
+    fill-opacity: 0.8;
+}
+
+.ppt-node__back-text--root--disabled {
+    fill: none;
+}
+
+.ppt-node__back-text--choose--disabled {
+    fill: none;
+}
+
+.ppt-node__back-text--value--disabled {
+    fill: none;
+}
+
+.ppt-node__back-text--choose--value-selected--disabled {
+    fill: none;
+}
+
+/* TEXT nodes*/
+.ppt-node__circle--root {
+    /*NA*/
+    /*fill: #2aa1d3;*/
+    /*stroke: #233E7E;*/
+    stroke: none;
+    /*stroke-width: 2px;*/
+}
+
+.ppt-node__circle--choose {
+    /*NA*/
+    /*fill: #8bb71a;*/
+    /*stroke: #628b1a;*/
+    stroke: none;
+    /*stroke-width: 2px;*/
+}
+
+.ppt-node__circle--group {
+    /*NA*/
+}
+
+.ppt-node__circle--value {
+    /*NA*/
+    /*fill: #f0b017;*/
+    /*stroke: #c28a17;*/
+    stroke: none;
+    /*stroke-width: 2px;*/
+}
+
+.ppt-node__circle--choose--disabled {
+    fill: #2e3138;
+    /*stroke: #525863;*/
+    stroke: none;
+    opacity: 0.5;
+}
+
+.ppt-node__circle--root--disabled {
+    fill: #2e3138;
+    /*stroke: #525863;*/
+    stroke: none;
+    opacity: 0.5;
+}
+
+/* IMAGE nodes*/
+.ppt-node__image--root {
+    /*NA*/
+}
+
+.ppt-node__image--choose {
+    /*NA*/
+}
+
+.ppt-node__image--group {
+    /*NA*/
+}
+
+.ppt-node__image--value {
+    /*NA*/
+}
+
+.ppt-node__image-background-circle--root {
+    fill: transparent;
+}
+
+.ppt-node__image-background-circle--choose {
+    fill: transparent;
+}
+
+.ppt-node__image-background-circle--value {
+    fill: transparent;
+}
+
+.ppt-node__image-background-circle--root--value-selected {
+    fill: transparent;
+}
+
+.ppt-node__image-background-circle--choose--value-selected {
+    fill: transparent;
+}
+
+.ppt-node__image--root--disabled {
+    filter: url(#grayscale);
+    opacity: 0.5;
+}
+
+.ppt-node__image--choose--disabled {
+    filter: url(#grayscale);
+    opacity: 0.5;
+}
+
+.ppt-node__image--choose--value-selected--disabled {
+    filter: url(#grayscale);
+    opacity: 0.5;
+}
+
+/* Symbol nodes*/
+.ppt-node__symbol--root {
+    stroke: none;
+}
+
+.ppt-node__symbol--choose {
+    stroke: none;
+}
+
+.ppt-node__symbol--group {
+    stroke: none;
+}
+
+.ppt-node__symbol--value {
+    stroke: none;
+}
+
+.ppt-node__symbol--root--disabled {
+    fill: #adaeaf;
+}
+
+.ppt-node__symbol--choose--disabled {
+    fill: #adaeaf;
+}
+
+.ppt-node__symbol--choose--value-selected--disabled {
+    fill: #adaeaf;
+}
+
+.ppt-node__symbol-background-circle--value {
+    fill: transparent;
+    stroke: none;
+}
+
+/******************Node Styles*************************/
+.ppt-node-ellipse {
+    stroke: #22252a;
+    stroke-width: 2px;
+}
+
+.ppt-segment {
+    stroke: #22252a;
+    stroke-width: 2px;
+}
+
+.ppt-segment.disabled {
+    /*fill: #2e3138;*/
+    /*stroke: #525863;*/
+    fill: #adaeaf;
+    stroke: #a5a5a6;
+}
+
+.ppt-text-arc {
+    display: none;
+}
+
+.ppt-text-arc.hover {
+    display: block;
+}
+
+.ppt-text-arc.disabled {
+    fill: none;
+}
+
+.ppt-text-arc.disabled.hover {
+    fill: #525863;
+}
+
+.ppt-node-ellipse.root {
+    /*fill: #2aa1d3;*/
+}
+
+.ppt-node-ellipse.root.disabled {
+    fill: #2e3138;
+    stroke: #525863;
+}
+
+.ppt-node-ellipse.choose {
+    /*fill: #8bb71a;*/
+}
+
+.ppt-node-ellipse.choose.disabled {
+    fill: #2e3138;
+    stroke: #525863;
+}
+
+.ppt-node-ellipse.value {
+    /*fill: #f0b017;*/
+}
+
+.ppt-node-ellipse.selected-value {
+    /*fill: #f0b017;*/
+}
+
+.ppt-node-ellipse.selected-root-value {
+    /*fill: #8F5BCC;*/
+}
+
+.ppt-node-ellipse.group {
+    /*fill: #525863;*/
+}
+
+.ppt-node-ellipse.disabled {
+    fill: #2e3138;
+    stroke: #525863;
+}
+
+/* Node background*/
+.ppt-svg-node-background {
+    fill: transparent;
+}
+
+.ppt-svg-node-symbol-background {
+    fill: transparent;
+    /*stroke: none;*/
+
+}
+
+.ppt-g-node-background {
+    cursor: pointer;
+}
+
+.ppt-g-node-background.hide {
+    display: none;
+}
+
+.ppt-node-background-circle {
+    fill-opacity: 0;
+}
+
+.ppt-node-background-circle.root {
+    fill: #233E7E;
+}
+
+.ppt-node-background-circle.choose {
+    fill: #628b1a;
+}
+
+.ppt-node-background-circle.value {
+    fill: #c28a17;
+}
+
+.ppt-node-background-circle.selected-value {
+    fill: #c28a17;
+}
+
+.ppt-node-background-circle.selected-root-value {
+    fill: #765ab4;
+}
+
+.ppt-node-background-circle.group {
+    fill: #3f4450;
+}
+
+.ppt-node-background-circle.disabled {
+    fill: #3f4450;
+}
+
+/* Node middleground */
+.ppt-g-node-middleground {
+    cursor: pointer;
+}
+
+/* Node foreground */
+.ppt-g-node-foreground {
+    cursor: pointer;
+}
+
+.ppt-count-box.value {
+    fill: #8bb71a;
+    fill-opacity: 0.8;
+    stroke: #ffffff;
+    stroke-width: 2px;
+}
+
+.ppt-count-box.root {
+    fill: #ee4e10;
+    fill-opacity: 0.8;
+    stroke: #ffffff;
+    stroke-width: 2px;
+}
+
+.ppt-count-box.root.disabled {
+    fill: #adaeaf;
+    fill-opacity: 0.8;
+    stroke: #8b8b8c;
+}
+
+.ppt-count-box.value.disabled {
+    fill: #adaeaf;
+    fill-opacity: 0.8;
+    stroke: #8b8b8c;
+}
+
+.ppt-count-text {
+    fill: white;
+}
+
+.ppt-count-text.disabled {
+    fill: #525863;
+}
+
+.ppt-rel-plus-icon {
+}
+
+.ppt-rel-plus-icon.disabled {
+    display: none;
+}
+
+.ppt-rel-plus-background {
+    fill: #f0b017;
+    fill-opacity: 0;
+}
+
+.ppt-rel-plus-path {
+    fill: #ff0000;
+}
+
+.ppt-rel-minus-icon {
+}
+
+.ppt-rel-minus-icon.disabled {
+    display: none;
+}
+
+.ppt-rel-minus-path {
+    fill: #ff0000;
+}
+
+.ppt-rel-minus-background {
+    fill: #f0b017;
+    fill-opacity: 0;
+}
+
+/******************Tool Styles*************************/
+.ppt-node-foreground-g-arrows {
+    display: none;
+}
+
+.ppt-node-foreground-g-arrows.active {
+    display: block;
+}
+
+.ppt-arrow {
+    fill: #ffffff;
+}
+
+.ppt-larrow {
+    stroke: #ffffff;
+    stroke-width: 4px;
+    fill: #525863;
+}
+
+.ppt-rarrow {
+    stroke: #ffffff;
+    stroke-width: 4px;
+    fill: #525863;
+}
+
+.ppt-larrow.enabled {
+    fill: #2aa1d3;
+}
+
+.ppt-rarrow.enabled {
+    fill: #2aa1d3;
+}
+
+/* text in nodes*/
+.ppt-node-text-root {
+    fill: #ffffff;
+}
+
+.ppt-node-text-root.disabled {
+    fill: #525863;
+}
+
+.ppt-node-text-choose {
+    fill: #ffffff;
+}
+
+.ppt-node-text-choose.disabled {
+    fill: #525863;
+}
+
+.ppt-node-text-value {
+    fill: #ffffff;
+}
+
+.ppt-node-text-group {
+    fill: #ffffff;
+}
+
+.ppt-g-node-ban {
+    fill: #ee4e10;
+    stroke: #ffffff;
+    display: none;
+}
+
+.ppt-g-node-ban.active {
+    display: block;
+}
+
+.ppt-svg-black {
+    fill: #2e3138;
+}
+
+.ppt-svg-blue {
+    fill: #2aa1d3;
+}
+
+.ppt-svg-green {
+    fill: #8bb71a;
+}
+
+.ppt-svg-yellow {
+    fill: #f0b017;
+}
+
+.ppt-svg-red {
+    fill: #ee4e10;
+}
+
+.ppt-svg-purple {
+    fill: #8F5BCC;
+}

@@ -1,0 +1,98 @@
+<!-- Add default CSS reference -->
+<link rel="stylesheet" href="https://unpkg.com/popoto/dist/popoto.min.css">
+<!-- Add Popoto script reference, will default to popoto.min.js -->
+<script src="https://unpkg.com/popoto"></script>
+<!-- Add Popoto script reference -->
+<script src="https://unpkg.com/popoto/dist/popoto.js"></script>
+
+<!DOCTYPE html>
+
+<html>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <a class="navbar-brand" href="/">B.E. Project</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+      <div class="navbar-nav">
+        <a class="nav-item nav-link" href="/">Home </a>
+        <a class="nav-item nav-link" href="/add">Allocate Funds </span></a>
+        <a class="nav-item nav-link active" href="/graph">Fund Flow<span class="sr-only">(current)</a>
+      </div>
+    </div>
+</nav>
+
+<head>
+    <title>BE Project</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
+    <link rel="stylesheet" href="dist/popoto.min.css">
+</head>
+
+
+<body class="ppt-body">
+
+<section class="ppt-section-main">
+
+    <div class="ppt-container-graph">
+        <nav id="popoto-taxonomy" class="ppt-taxo-nav">
+            <!-- Label/taxonomy filter will be generated here -->
+        </nav>
+        <div id="popoto-graph" class="ppt-div-graph">
+            <!-- Graph will be generated here-->
+        </div>
+    </div>
+
+    <div id="popoto-query" class="ppt-container-query">
+        <!-- Query viewer will be generated here -->
+    </div>
+
+    <div id="popoto-cypher" class="ppt-container-cypher">
+        <!-- Cypher query viewer will be generated here -->
+    </div>
+
+    <div class="ppt-section-header">
+        <!-- The total results count is updated with a listener defined below -->
+        RESULTS <span id="result-total-count" class="ppt-count"></span>
+    </div>
+
+    <div id="popoto-results" class="ppt-container-results">
+        <!-- Results will be generated here -->
+    </div>
+
+</section>
+
+<!-- Required scripts -->
+
+<script src="https://unpkg.com/jquery" charset="utf-8"></script>
+<script src="https://unpkg.com/d3" charset="utf-8"></script>
+<script src="dist/popoto.min.js" charset="utf-8"></script>
+
+
+<script>
+    popoto.rest.CYPHER_URL = "http://localhost:7474/browser";
+    popoto.rest.AUTHORIZATION = "Basic " + btoa("neo4j:123456");
+
+    popoto.provider.node.Provider = {
+        "Government": {
+            "returnAttributes": ["name"],
+            "constraintAttribute": "name",
+            "autoExpandRelations": true // if set to true Person nodes will be automatically expanded in graph
+        },
+        "School": {
+            "returnAttributes": ["name"],
+            "constraintAttribute": "name"
+        }
+    };
+
+    popoto.result.onTotalResultCount(function (count) {
+        document.getElementById("result-total-count").innerHTML = "(" + count + ")";
+    });
+
+    popoto.query.RESULTS_PAGE_SIZE = 100;
+
+    popoto.logger.LEVEL = popoto.logger.LogLevels.INFO;
+
+    popoto.start("Government");
+
+</script>
