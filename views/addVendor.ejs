@@ -38,32 +38,19 @@
 
 <div style="margin: 2.5%;">
     <h3 class="display-4" style="text-align: center;">Allocation & Tracking of Public Funds using Blockchain</h3>
-    <h6 style="text-align: center;">User Type: Government</h6>
+    <h6 style="text-align: center;">User Type: School</h6>
     <br>
     <br>
     <div id='status' class='invisible'><%= isAdded %></div>
     <div class="row">
+        <div class="col-md-3"></div>
         <div class="col-md-6">
-            <p class="display-4" style="font-size:xx-large"><b>Allocate Funds for lower governemnt levels</b></p>
-            <form id="gtogForm" method="POST" action="/allocate/gtog">
+            <p class="display-4" style="font-size:xx-large"><b>From school to vendor</b></p>
+            <form id="gtosForm" method="POST" action="/school/vendor">
                 <div class="input-group mb-3">
                     <div class="input-group">
-                        <input type="text" class="form-control" name="name1" placeholder="Government From - Name">
-                        <input type="text" class="form-control" name="name2" placeholder="Government To -  Name">
-                        <div class="input-group-append">
-                            <button class="btn btn-primary" type="submit" type="button">Submit</button>
-                        </div>
-                    </div>
-                </div>
-            </form>
-        </div>
-        <div class="col-md-6">
-            <p class="display-4" style="font-size:xx-large"><b>Allocate Funds for schools</b></p>
-            <form id="gtosForm" method="POST" action="/allocate/gtos">
-                <div class="input-group mb-3">
-                    <div class="input-group">
-                        <input type="text" class="form-control" name="name1" placeholder="Government Name">
-                        <input type="text" class="form-control" name="name2" placeholder="School Name">
+                        <input type="text" class="form-control" name="name1" placeholder="School Name">
+                        <input type="text" class="form-control" name="name2" placeholder="Vendor Name">
                         <div class="input-group-append">
                             <button class="btn btn-primary" type="submit" type="button">Submit</button>
                         </div>
@@ -72,5 +59,4 @@
             </form>
         </div>
     </div>
-    <br>
 </div>

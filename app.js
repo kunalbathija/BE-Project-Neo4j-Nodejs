@@ -48,8 +48,8 @@ var driver = neo4j.driver("bolt://localhost", neo4j.auth.basic("neo4j", "123456"
 var session = driver.session()
 
 var users = [
-    { id: '1613226927108', name: 'Kunal', email: 'kunalbathija97@gmail.com', password: '123456' },
-    { id: '1613226927109', name: 'Kalpesh', email: 'kalpeshbhole@gmail.com', password: '123456' },
+    { id: '1613226927108', name: 'Kunal', email: 'kunalbathija97@gmail.com', password: '123456', type: 'Government'},
+    { id: '1613226927109', name: 'Kalpesh', email: 'kalpeshbhole@gmail.com', password: '123456', type: 'School'},
 
 ]
 
@@ -107,6 +107,22 @@ app.get('/add', checkAuthenticated, function(req, res){
 
 });
 
+//Get AddVendor
+app.get('/addVendor', checkAuthenticated, function(req, res){
+
+    var isAdded = req.query.success;
+    if(isAdded){
+        isAdded = true;
+    }else{
+        isAdded = false;
+    }
+
+    res.render('addVendor', {
+        isAdded : isAdded
+    });
+
+});
+
 app.get('/login', checkNotAuthenticated, function(req, res){
     res.render('login')
 });
@@ -122,7 +138,8 @@ app.post('/register', checkNotAuthenticated, async function(req, res){
             id: Date.now().toString(),
             name: req.body.name,
             email: req.body.email,
-            password: req.body.password
+            password: req.body.password,
+            type: req.body.type
         })
         console.log(users)
         res.redirect('/login')
@@ -132,12 +149,49 @@ app.post('/register', checkNotAuthenticated, async function(req, res){
     }
 });
 
-app.post('/login', checkNotAuthenticated, passport.authenticate('local', {
-    successRedirect: '/',
-    failureRedirect: '/login',
-    failureFlash: true
-}));
+app.post('/login', function(req, res, next) {
+    passport.authenticate('local', function(err, user, info) {
+      if (err) { return next(err); }
+      if (!user) { return res.redirect('/login'); }
+      req.logIn(user, function(err) {
+        if (err) { return next(err); }
+        else {
+            if(req.user.type==='Government'){
+                console.log(req.user.type)
+                return res.redirect('/');
+            }
+            else if(req.user.type==='School'){
+                console.log(req.user.type)
+                return  res.redirect('indexVendor');
+            }
+        }
+      });
+    })(req, res, next);
+  });
 
+
+app.get('/indexVendor', checkAuthenticated, function(req, res){
+    session
+        .run("MATCH (n: Vendor) RETURN n")
+        .then(function(result){
+            var vendorsArr = [];
+            result.records.forEach(function(record){
+                vendorsArr.push({
+                    id: record._fields[0].identity.low,
+                    name: record._fields[0].properties.name
+                });
+                //console.log(record._fields[0]);
+            });
+
+        res.render('indexVendor', {
+            vendors: vendorsArr
+        });    
+            
+        })
+        .catch(function(error){
+            console.log(error);
+        });
+});
 
 
 //Add Government Route
@@ -167,6 +221,19 @@ app.post('/school/add', checkAuthenticated, function(req, res){
         });
 });
 
+//Add vendor 
+app.post('/vendor/add', checkAuthenticated, function(req, res){
+    var name = req.body.name;
+
+    session
+        .run("CREATE (n: Vendor{name: {nameParam}}) RETURN n.name",{nameParam: name})
+        .then(function(result){
+            res.redirect('/addVendor');
+        })
+        .catch(function(error){
+            console.log(error);
+        });
+});
 
 //Allocate G to G
 app.post('/allocate/gtog', checkAuthenticated, function(req, res){
@@ -190,6 +257,21 @@ app.post('/allocate/gtos', checkAuthenticated, function(req, res){
 
     session
         .run("MATCH(a:Government{name:{nameParam1}}), (b:School{name:{nameParam2}}) MERGE (a)-[r:FUND_DISBURSED]->(b) RETURN a,b ",{nameParam1: name1, nameParam2: name2})
+        .then(function(result){
+            res.redirect('/add?success=true');
+        })
+        .catch(function(error){
+            console.log(error);
+        });
+});
+
+//School to vendor 
+app.post('/school/vendor', checkAuthenticated, function(req, res){
+    var name1 = req.body.name1;
+    var name2 = req.body.name2;
+
+    session
+        .run("MATCH(a:School{name:{nameParam1}}), (b:Vendor{name:{nameParam2}}) MERGE (a)-[r:FUND_DISBURSED]->(b) RETURN a,b ",{nameParam1: name1, nameParam2: name2})
         .then(function(result){
             res.redirect('/add?success=true');
         })

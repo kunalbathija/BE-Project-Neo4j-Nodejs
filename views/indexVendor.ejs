@@ -11,7 +11,7 @@
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
       <div class="navbar-nav">
         <a class="nav-item nav-link active" href="/">Home  <span class="sr-only">(current)</span></a>
-        <a class="nav-item nav-link" href="/add">Allocate funds</a>
+        <a class="nav-item nav-link" href="/addVendor">Allocate funds</a>
         <a class="nav-item nav-link" href="/graph">Fund Tracking</a>
       </div>
     </div>
@@ -22,17 +22,14 @@
     </ul>
 </nav>
 <div style="margin: 2.5%;">
-    
     <h3 class="display-4" style="text-align: center;">Allocation & Tracking of Public Funds using Blockchain</h3>
-    <h6 style="text-align: center;">User Type: Government</h6>
+    <h6 style="text-align: center;">User Type: School</h6>
     <br>
     <br>
     <div class="row align-items-start">
         <div class="col" style="margin-left: 5%;">
-            <p class="display-4" style="font-size:xx-large"><b>Add New Government Level</b></p>
-            <form method="POST" action="/government/add">
-                <!-- <input type="text" name="name" placeholder="Name">
-                <button type="submit" class="btn btn-primary">Submit</button> -->
+            <p class="display-4" style="font-size:xx-large"><b>Add New Vendor</b></p>
+            <form method="POST" action="/vendor/add">
                 <div class="input-group mb-3" style="width: 25rem;"> 
                     <input type="text" class="form-control" name="name" placeholder="Name">
                     <div class="input-group-append">
@@ -40,48 +37,17 @@
                     </div>
                 </div>
             </form>
-    
-            <p class="display-4" style="font-size:xx-large"><b>Government's Levels Involved</b></p>
+        </div>
+        <div class="col">
+            <p class="display-4" style="font-size:xx-large"><b>Vendors List</b></p>
             <div class="card" style="width: 25rem;">
                 <ul class="list-group list-group-flush">
-                    <% governs.forEach(function(govern){ %>
-                        <li class="list-group-item lead"><%= govern.name %></li>
+                    <% vendors.forEach(function(vendor){ %>
+                        <li class="list-group-item lead"><%= vendor.name %></li>
                     <% }) %>
                 </ul>
             </div>
         </div>
-        <div class="col">
-            <p class="display-4" style="font-size:xx-large"><b>Add New School</b></p>
-            <form method="POST" action="/school/add">
-                <div class="input-group mb-3" style="width: 25rem;">
-                    <input type="text" class="form-control" name="name" placeholder="Name">
-                    <div class="input-group-append">
-                        <button class="btn btn-primary" type="submit" type="button">Submit</button>
-                    </div>
-                </div>
-            </form>
-    
-            <p class="display-4" style="font-size:xx-large"><b>Schools Involved</b></p>
-            <div class="card" style="width: 25rem;">
-                <ul class="list-group list-group-flush">
-                <% schools.forEach(function(school){ %>
-                    <li class="list-group-item lead"><%= school.name %></li>
-                <% }) %>
-                </ul>
-            </div>
         </div>
     </div>
-    <br>
-    
-    
 </div>
-
-
-
-
-
-
-
-
-
-
