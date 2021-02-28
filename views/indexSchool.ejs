@@ -1,0 +1,73 @@
+<head>
+    <title>BE Project</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">  
+</head>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark"">
+    <a class="navbar-brand" href="/indexSchool">B.E. Project</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+      <div class="navbar-nav">
+        <a class="nav-item nav-link active" href="/indexSchool">Home  <span class="sr-only">(current)</span></a>
+        <a class="nav-item nav-link" href="/addSchool">Allocate funds</a>
+        <a class="nav-item nav-link disabled" href="/graph">Fund Tracking</a>
+      </div>
+    </div>
+    <ul class="nav navbar-nav ml-auto">
+        <a class="nav-item nav-link" >Hello, <%= username %></a>
+        <form class="form-inline" action="/logout?_method=DELETE" method="POST">
+            <button class="btn btn-outline-danger" type="submit">Logout</button>
+          </form>
+    </ul>
+</nav>
+<div style="margin: 2.5%;">
+    
+    <h3 class="display-4" style="text-align: center;">Allocation & Tracking of Public Funds using Blockchain</h3>
+    <h6 style="text-align: center;">User Type: District Government</h6>
+    <br>
+    <br>
+
+    <div class="row align-items-start">
+        <div class="col">
+            <p class="display-4" style="font-size:xx-large"><b>Add New School</b></p>
+            <form method="POST" action="/school/add">
+                <div class="input-group mb-3" style="width: 25rem;">
+                    <input type="text" class="form-control" name="name" placeholder="Name">
+                    <div class="input-group-append">
+                        <button class="btn btn-primary" type="submit" type="button">Submit</button>
+                    </div>
+                </div>
+            </form>
+            <p class="display-4" style="font-size:xx-large"><b>Schools Involved</b></p>
+            <div class="card" style="width: 25rem;">
+                <ul class="list-group list-group-flush">
+                <% schools.forEach(function(school){ %>
+                    <li class="list-group-item lead"><%= school.name %></li>
+                <% }) %>
+                </ul>
+            </div>
+        </div>
+        <div class="col">
+            <p class="display-4" style="font-size:xx-large"><b>Add New Vendor</b></p>
+            <form method="POST" action="/vendor/add">
+                <div class="input-group mb-3" style="width: 25rem;"> 
+                    <input type="text" class="form-control" name="name" placeholder="Name">
+                    <div class="input-group-append">
+                      <button class="btn btn-primary" type="submit" type="button">Submit</button>
+                    </div>
+                </div>
+            </form>
+            <p class="display-4" style="font-size:xx-large"><b>Vendors List</b></p>
+            <div class="card" style="width: 25rem;">
+                <ul class="list-group list-group-flush">
+                    <% vendors.forEach(function(vendor){ %>
+                        <li class="list-group-item lead"><%= vendor.name %></li>
+                    <% }) %>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+</div>

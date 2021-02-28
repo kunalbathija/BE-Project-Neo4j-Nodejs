@@ -4,14 +4,14 @@
 </head>
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark"">
-    <a class="navbar-brand" href="/indexVendor">B.E. Project</a>
+    <a class="navbar-brand" href="/indexDistrict">B.E. Project</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
       <div class="navbar-nav">
-        <a class="nav-item nav-link active" href="/indexVendor">Home  <span class="sr-only">(current)</span></a>
-        <a class="nav-item nav-link" href="/addVendor">Allocate funds</a>
+        <a class="nav-item nav-link active" href="/indexDistrict">Home  <span class="sr-only">(current)</span></a>
+        <a class="nav-item nav-link" href="/addDistrict">Allocate funds</a>
         <a class="nav-item nav-link disabled" href="/graph">Fund Tracking</a>
       </div>
     </div>
@@ -23,21 +23,33 @@
     </ul>
 </nav>
 <div style="margin: 2.5%;">
+    
     <h3 class="display-4" style="text-align: center;">Allocation & Tracking of Public Funds using Blockchain</h3>
-    <h6 style="text-align: center;">User Type: School</h6>
+    <h6 style="text-align: center;">User Type: State Government</h6>
     <br>
     <br>
-    <div class="row align-items-start" style="justify-content: center;">
+    <div class="row align-items-start">
+        <div class="col" style="margin-left: 5%;">
+            <p class="display-4" style="font-size:xx-large"><b>Add New District Government</b></p>
+            <form method="POST" action="/district/add">
+                <div class="input-group mb-3" style="width: 25rem;"> 
+                    <input type="text" class="form-control" name="name" placeholder="Name">
+                    <div class="input-group-append">
+                      <button class="btn btn-primary" type="submit" type="button">Submit</button>
+                    </div>
+                </div>
+            </form>
+        </div>
         <div class="col">
-            <p class="display-4" style="font-size:xx-large"><b>Vendors List</b></p>
+            <p class="display-4" style="font-size:xx-large"><b>List of District Governments</b></p>
             <div class="card" style="width: 25rem;">
                 <ul class="list-group list-group-flush">
-                    <% vendors.forEach(function(vendor){ %>
-                        <li class="list-group-item lead"><%= vendor.name %></li>
+                    <% districts.forEach(function(district){ %>
+                        <li class="list-group-item lead"><%= district.name %></li>
                     <% }) %>
                 </ul>
             </div>
         </div>
-        </div>
     </div>
+
 </div>

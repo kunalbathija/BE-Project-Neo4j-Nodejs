@@ -18,18 +18,19 @@
 </script>
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <a class="navbar-brand" href="/">B.E. Project</a>
+    <a class="navbar-brand" href="/index">B.E. Project</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
       <div class="navbar-nav">
-        <a class="nav-item nav-link" href="/">Home</a>
+        <a class="nav-item nav-link" href="/index">Home</a>
         <a class="nav-item nav-link active" href="/add">Allocate Funds <span class="sr-only">(current)</span></a>
         <a class="nav-item nav-link" href="/graph">Fund Tracking</a>
       </div>
     </div>
     <ul class="nav navbar-nav ml-auto">
+        <a class="nav-item nav-link" >Hello, <%= username %></a>
         <form class="form-inline" action="/logout?_method=DELETE" method="POST">
             <button class="btn btn-outline-danger" type="submit">Logout</button>
           </form>
@@ -41,15 +42,20 @@
     <h6 style="text-align: center;">User Type: Government</h6>
     <br>
     <br>
-    <div id='status' class='invisible'><%= isAdded %></div>
     <div class="row">
+        <div class="col-md-3"></div>
         <div class="col-md-6">
-            <p class="display-4" style="font-size:xx-large"><b>Allocate Funds for lower governemnt levels</b></p>
-            <form id="gtogForm" method="POST" action="/allocate/gtog">
+            <p class="display-4" style="font-size:xx-large"><b>Allocate Funds to State</b></p>
+            <form id="gtogForm" method="POST" action="/allocate/ctos">
                 <div class="input-group mb-3">
                     <div class="input-group">
-                        <input type="text" class="form-control" name="name1" placeholder="Government From - Name">
-                        <input type="text" class="form-control" name="name2" placeholder="Government To -  Name">
+                        <input type="text" class="form-control" name="name1" value="Central Government" readonly="readonly" >
+                        <input type="text" class="form-control" name="amount" placeholder="Amount in Rupees.">
+                        <select name="name2" id="name2" class="form-control">
+                            <% governs.forEach(function(govern){ %>
+                                <option value="<%= govern.name %>"><%= govern.name %></option>
+                            <% }) %>
+                        </select>
                         <div class="input-group-append">
                             <button class="btn btn-primary" type="submit" type="button">Submit</button>
                         </div>
@@ -57,7 +63,7 @@
                 </div>
             </form>
         </div>
-        <div class="col-md-6">
+        <!-- <div class="col-md-6">
             <p class="display-4" style="font-size:xx-large"><b>Allocate Funds for schools</b></p>
             <form id="gtosForm" method="POST" action="/allocate/gtos">
                 <div class="input-group mb-3">
@@ -70,7 +76,7 @@
                     </div>
                 </div>
             </form>
-        </div>
+        </div> -->
     </div>
     <br>
 </div>

@@ -18,18 +18,19 @@
 </script>
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <a class="navbar-brand" href="/">B.E. Project</a>
+    <a class="navbar-brand" href="/indexVendor">B.E. Project</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
       <div class="navbar-nav">
-        <a class="nav-item nav-link" href="/">Home</a>
-        <a class="nav-item nav-link active" href="/add">Allocate Funds <span class="sr-only">(current)</span></a>
-        <a class="nav-item nav-link" href="/graph">Fund Tracking</a>
+        <a class="nav-item nav-link" href="/indexVendor">Home</a>
+        <a class="nav-item nav-link active" href="/addVendor">Allocate Funds <span class="sr-only">(current)</span></a>
+        <a class="nav-item nav-link disabled" href="/graph">Fund Tracking</a>
       </div>
     </div>
     <ul class="nav navbar-nav ml-auto">
+        <a class="nav-item nav-link" >Hello, <%= username %></a>
         <form class="form-inline" action="/logout?_method=DELETE" method="POST">
             <button class="btn btn-outline-danger" type="submit">Logout</button>
           </form>
@@ -49,8 +50,13 @@
             <form id="gtosForm" method="POST" action="/school/vendor">
                 <div class="input-group mb-3">
                     <div class="input-group">
-                        <input type="text" class="form-control" name="name1" placeholder="School Name">
-                        <input type="text" class="form-control" name="name2" placeholder="Vendor Name">
+                        <input type="text" class="form-control" name="name1" value="<%= username %>" readonly>
+                        <input type="text" class="form-control" name="amount" placeholder="Amount in Rupees.">
+                        <select name="name2" id="name2" class="form-control">
+                            <% vendors.forEach(function(vendor){ %>
+                                  <option value="<%= vendor.name %>"><%= vendor.name %></option>
+                              <% }) %>
+                          </select>
                         <div class="input-group-append">
                             <button class="btn btn-primary" type="submit" type="button">Submit</button>
                         </div>

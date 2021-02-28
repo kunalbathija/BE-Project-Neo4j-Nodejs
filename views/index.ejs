@@ -4,18 +4,19 @@
 </head>
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark"">
-    <a class="navbar-brand" href="/">B.E. Project</a>
+    <a class="navbar-brand" href="/index">B.E. Project</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
       <div class="navbar-nav">
-        <a class="nav-item nav-link active" href="/">Home  <span class="sr-only">(current)</span></a>
+        <a class="nav-item nav-link active" href="/index">Home  <span class="sr-only">(current)</span></a>
         <a class="nav-item nav-link" href="/add">Allocate funds</a>
         <a class="nav-item nav-link" href="/graph">Fund Tracking</a>
       </div>
     </div>
     <ul class="nav navbar-nav ml-auto">
+        <a class="nav-item nav-link" >Hello, <%= username %></a>
         <form class="form-inline" action="/logout?_method=DELETE" method="POST">
             <button class="btn btn-outline-danger" type="submit">Logout</button>
           </form>
@@ -29,8 +30,8 @@
     <br>
     <div class="row align-items-start">
         <div class="col" style="margin-left: 5%;">
-            <p class="display-4" style="font-size:xx-large"><b>Add New Government Level</b></p>
-            <form method="POST" action="/government/add">
+            <p class="display-4" style="font-size:xx-large"><b>Add New State Government</b></p>
+            <form method="POST" action="/state/add">
                 <!-- <input type="text" name="name" placeholder="Name">
                 <button type="submit" class="btn btn-primary">Submit</button> -->
                 <div class="input-group mb-3" style="width: 25rem;"> 
@@ -40,8 +41,9 @@
                     </div>
                 </div>
             </form>
-    
-            <p class="display-4" style="font-size:xx-large"><b>Government's Levels Involved</b></p>
+        </div>
+        <div class="col">
+            <p class="display-4" style="font-size:xx-large"><b>List of State Governments</b></p>
             <div class="card" style="width: 25rem;">
                 <ul class="list-group list-group-flush">
                     <% governs.forEach(function(govern){ %>
@@ -50,29 +52,9 @@
                 </ul>
             </div>
         </div>
-        <div class="col">
-            <p class="display-4" style="font-size:xx-large"><b>Add New School</b></p>
-            <form method="POST" action="/school/add">
-                <div class="input-group mb-3" style="width: 25rem;">
-                    <input type="text" class="form-control" name="name" placeholder="Name">
-                    <div class="input-group-append">
-                        <button class="btn btn-primary" type="submit" type="button">Submit</button>
-                    </div>
-                </div>
-            </form>
-    
-            <p class="display-4" style="font-size:xx-large"><b>Schools Involved</b></p>
-            <div class="card" style="width: 25rem;">
-                <ul class="list-group list-group-flush">
-                <% schools.forEach(function(school){ %>
-                    <li class="list-group-item lead"><%= school.name %></li>
-                <% }) %>
-                </ul>
-            </div>
-        </div>
+
     </div>
     <br>
-    
     
 </div>
 

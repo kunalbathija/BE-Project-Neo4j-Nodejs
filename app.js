@@ -48,79 +48,15 @@ var driver = neo4j.driver("bolt://localhost", neo4j.auth.basic("neo4j", "123456"
 var session = driver.session()
 
 var users = [
-    { id: '1613226927108', name: 'Kunal', email: 'kunalbathija97@gmail.com', password: '123456', type: 'Government'},
-    { id: '1613226927109', name: 'Kalpesh', email: 'kalpeshbhole@gmail.com', password: '123456', type: 'School'},
-
+    { id: '1613226927108', name: 'Central Government', email: 'central_government', password: '123456', type: 'C_Gvt'},
+    { id: '1613226927109', name: 'Maharashtra State Government', email: 'maha_state_government', password: '123456', type: 'S_Gvt'},
+    { id: '1613226927110', name: 'Mumbai District Government', email: 'mumbai_district_government', password: '123456', type: 'D_Gvt'},
+    { id: '1613226927111', name: 'ABC School', email: 'ABC_School', password: '123456', type: 'School'},
+    { id: '1613226927112', name: 'PQR School', email: 'PQR_School', password: '123456', type: 'School'}
 ]
 
-//Home Route
-app.get('/', checkAuthenticated, function(req, res){
-    session
-        .run("MATCH (n: Government) RETURN n")
-        .then(function(result){
-            var governArr = [];
-            result.records.forEach(function(record){
-                governArr.push({
-                    id: record._fields[0].identity.low,
-                    name: record._fields[0].properties.name
-                });
-                //console.log(record._fields[0]);
-            });
-
-            session
-                .run("MATCH (n: School) RETURN n")
-                .then(function(result2){
-                    var schoolArr = [];
-                    result2.records.forEach(function(record){
-                        schoolArr.push({
-                            id: record._fields[0].identity.low,
-                            name: record._fields[0].properties.name
-                        });
-                    });
-
-                    res.render('index', {
-                        governs: governArr,
-                        schools: schoolArr
-                    });
-                })
-            
-        })
-        .catch(function(error){
-            console.log(error);
-        });
-});
-
-
-//Get Add
-app.get('/add', checkAuthenticated, function(req, res){
-
-    var isAdded = req.query.success;
-    if(isAdded){
-        isAdded = true;
-    }else{
-        isAdded = false;
-    }
-
-    res.render('add', {
-        isAdded : isAdded
-    });
-
-});
-
-//Get AddVendor
-app.get('/addVendor', checkAuthenticated, function(req, res){
-
-    var isAdded = req.query.success;
-    if(isAdded){
-        isAdded = true;
-    }else{
-        isAdded = false;
-    }
-
-    res.render('addVendor', {
-        isAdded : isAdded
-    });
-
+app.get('/', checkNotAuthenticated, function(req, res){
+    res.redirect('index')
 });
 
 app.get('/login', checkNotAuthenticated, function(req, res){
@@ -156,18 +92,242 @@ app.post('/login', function(req, res, next) {
       req.logIn(user, function(err) {
         if (err) { return next(err); }
         else {
-            if(req.user.type==='Government'){
+            if(req.user.type==='C_Gvt'){ //State and allocate 
                 console.log(req.user.type)
-                return res.redirect('/');
+                return res.redirect('/index');
             }
-            else if(req.user.type==='School'){
+            else if(req.user.type==='S_Gvt'){ //District and allocate -> 
+                console.log(req.user.type)
+                return  res.redirect('indexDistrict');
+            }
+            else if(req.user.type==='D_Gvt'){ // Schools and vendors 
+                console.log(req.user.type)
+                return  res.redirect('indexSchool');
+            }
+            else if(req.user.type==='School'){ //Allocate to vendor
                 console.log(req.user.type)
                 return  res.redirect('indexVendor');
             }
         }
       });
     })(req, res, next);
-  });
+});
+
+
+//Home Route
+app.get('/index', checkAuthenticated, function(req, res){
+    session
+        .run("MATCH (n: State_Gvt) RETURN n")
+        .then(function(result){
+            var governArr = [];
+            result.records.forEach(function(record){
+                governArr.push({
+                    id: record._fields[0].identity.low,
+                    name: record._fields[0].properties.name
+                });
+                //console.log(record._fields[0]);
+            });
+        res.render('index', {
+            governs: governArr,
+            username: req.user.name
+        });
+            
+        })
+        .catch(function(error){
+            console.log(error);
+        });
+});
+
+//Get Add
+app.get('/add', checkAuthenticated, function(req, res){
+
+    var isAdded = req.query.success;
+    if(isAdded){
+        isAdded = true;
+    }else{
+        isAdded = false;
+    }
+
+
+    session
+        .run("MATCH (n: State_Gvt) RETURN n")
+        .then(function(result){
+            var governArr = [];
+            result.records.forEach(function(record){
+                governArr.push({
+                    id: record._fields[0].identity.low,
+                    name: record._fields[0].properties.name
+                });
+                //console.log(record._fields[0]);
+            });
+        res.render('add', {
+            governs: governArr,
+            isAdded : isAdded,
+            username: req.user.name
+        });
+            
+        })
+        .catch(function(error){
+            console.log(error);
+        });
+
+});
+
+
+
+app.get('/indexDistrict', checkAuthenticated, function(req, res){
+    session
+        .run("MATCH (n: District_Gvt) RETURN n")
+        .then(function(result){
+            var districtsArr = [];
+            result.records.forEach(function(record){
+                districtsArr.push({
+                    id: record._fields[0].identity.low,
+                    name: record._fields[0].properties.name
+                });
+            });
+
+        res.render('indexDistrict', {
+            districts: districtsArr,
+            username: req.user.name,
+        });    
+            
+        })
+        .catch(function(error){
+            console.log(error);
+        });
+});
+
+app.get('/addDistrict', checkAuthenticated, function(req, res){
+    var isAdded = req.query.success;
+    if(isAdded){
+        isAdded = true;
+    }else{
+        isAdded = false;
+    }
+
+    session
+        .run("MATCH (n: District_Gvt) RETURN n")
+        .then(function(result){
+            var districtsArr = [];
+            result.records.forEach(function(record){
+                districtsArr.push({
+                    id: record._fields[0].identity.low,
+                    name: record._fields[0].properties.name
+                });
+            });
+
+        res.render('addDistrict', {
+            districts: districtsArr,
+            isAdded : isAdded,
+            username: req.user.name,
+        });    
+            
+        })
+        .catch(function(error){
+            console.log(error);
+        });
+});
+
+app.get('/indexSchool', checkAuthenticated, function(req, res){
+    session
+    .run("MATCH (n: School) RETURN n")
+        .then(function(result){
+            var schoolsArr = [];
+            result.records.forEach(function(record){
+                schoolsArr.push({
+                    id: record._fields[0].identity.low,
+                    name: record._fields[0].properties.name
+                });
+            });
+
+            session
+                .run("MATCH (n: Vendor) RETURN n")
+                .then(function(result2){
+                    var vendorsArr = [];
+                    result2.records.forEach(function(record){
+                        vendorsArr.push({
+                            id: record._fields[0].identity.low,
+                            name: record._fields[0].properties.name
+                        });
+                    });
+
+                    res.render('indexSchool', {
+                        schools: schoolsArr,
+                        vendors: vendorsArr,
+                        username: req.user.name,
+                    });
+                })
+            
+        })
+        .catch(function(error){
+            console.log(error);
+        });
+});
+
+app.get('/addSchool', checkAuthenticated, function(req, res){
+    var isAdded = req.query.success;
+    if(isAdded){
+        isAdded = true;
+    }else{
+        isAdded = false;
+    }
+
+    session
+        .run("MATCH (n: School) RETURN n")
+        .then(function(result){
+            var schoolsArr = [];
+            result.records.forEach(function(record){
+                schoolsArr.push({
+                    id: record._fields[0].identity.low,
+                    name: record._fields[0].properties.name
+                });
+            });
+
+        res.render('addSchool', {
+            schools: schoolsArr,
+            isAdded : isAdded,
+            username: req.user.name,
+        });    
+            
+        })
+        .catch(function(error){
+            console.log(error);
+        });
+});
+
+//Get AddVendor
+app.get('/addVendor', checkAuthenticated, function(req, res){
+
+    var isAdded = req.query.success;
+    if(isAdded){
+        isAdded = true;
+    }else{
+        isAdded = false;
+    }
+    session
+        .run("MATCH (n: Vendor) RETURN n")
+        .then(function(result2){
+            var vendorsArr = [];
+            result2.records.forEach(function(record){
+                vendorsArr.push({
+                    id: record._fields[0].identity.low,
+                    name: record._fields[0].properties.name
+                });
+            });
+
+            res.render('addVendor', {
+                isAdded : isAdded,
+                username: req.user.name,
+                vendors: vendorsArr
+                
+            });
+        })
+        .catch(function(error){
+            console.log(error);
+        });
+
+});
 
 
 app.get('/indexVendor', checkAuthenticated, function(req, res){
@@ -184,7 +344,8 @@ app.get('/indexVendor', checkAuthenticated, function(req, res){
             });
 
         res.render('indexVendor', {
-            vendors: vendorsArr
+            vendors: vendorsArr,
+            username: req.user.name,
         });    
             
         })
@@ -193,15 +354,28 @@ app.get('/indexVendor', checkAuthenticated, function(req, res){
         });
 });
 
-
 //Add Government Route
-app.post('/government/add', checkAuthenticated, function(req, res){
+app.post('/state/add', checkAuthenticated, function(req, res){
     var name = req.body.name;
 
     session
-        .run("CREATE (n: Government{name: {nameParam}}) RETURN n.name",{nameParam: name})
+        .run("CREATE (n: State_Gvt{name: {nameParam}}) RETURN n.name",{nameParam: name})
         .then(function(result){
-            res.redirect('/');
+            res.redirect('/index');
+        })
+        .catch(function(error){
+            console.log(error);
+        });
+});
+
+//Add District Government Route
+app.post('/district/add', checkAuthenticated, function(req, res){
+    var name = req.body.name;
+
+    session
+        .run("CREATE (n: District_Gvt{name: {nameParam}}) RETURN n.name",{nameParam: name})
+        .then(function(result){
+            res.redirect('/indexDistrict');
         })
         .catch(function(error){
             console.log(error);
@@ -214,7 +388,7 @@ app.post('/school/add', checkAuthenticated, function(req, res){
     session
         .run("CREATE (n: School{name: {nameParam}}) RETURN n.name",{nameParam: name})
         .then(function(result){
-            res.redirect('/');
+            res.redirect('/indexSchool');
         })
         .catch(function(error){
             console.log(error);
@@ -228,7 +402,7 @@ app.post('/vendor/add', checkAuthenticated, function(req, res){
     session
         .run("CREATE (n: Vendor{name: {nameParam}}) RETURN n.name",{nameParam: name})
         .then(function(result){
-            res.redirect('/addVendor');
+            res.redirect('/indexSchool');
         })
         .catch(function(error){
             console.log(error);
@@ -236,12 +410,13 @@ app.post('/vendor/add', checkAuthenticated, function(req, res){
 });
 
 //Allocate G to G
-app.post('/allocate/gtog', checkAuthenticated, function(req, res){
+app.post('/allocate/ctos', checkAuthenticated, function(req, res){
     var name1 = req.body.name1;
     var name2 = req.body.name2;
+    var amount = req.body.amount;
 
     session
-        .run("MATCH(a:Government{name:{nameParam1}}), (b:Government{name:{nameParam2}}) MERGE (a)-[r:FUND_ALLOCATED]->(b) RETURN a,b ",{nameParam1: name1, nameParam2: name2})
+        .run("MATCH(a:Central_Gvt{name:{nameParam1}}), (b:State_Gvt{name:{nameParam2}}) MERGE (a)-[r:FUND_ALLOCATED{amount: {amountPara}}]->(b) RETURN a,b ",{nameParam1: name1, nameParam2: name2, amountPara: amount})
         .then(function(result){
             res.redirect('/add?success=true');
         })
@@ -250,15 +425,32 @@ app.post('/allocate/gtog', checkAuthenticated, function(req, res){
         });
 });
 
-//Allocate G to S
-app.post('/allocate/gtos', checkAuthenticated, function(req, res){
+//Allocate G to G
+app.post('/allocate/stod', checkAuthenticated, function(req, res){
     var name1 = req.body.name1;
     var name2 = req.body.name2;
+    var amount = req.body.amount;
 
     session
-        .run("MATCH(a:Government{name:{nameParam1}}), (b:School{name:{nameParam2}}) MERGE (a)-[r:FUND_DISBURSED]->(b) RETURN a,b ",{nameParam1: name1, nameParam2: name2})
+        .run("MATCH(a:State_Gvt{name:{nameParam1}}), (b:District_Gvt{name:{nameParam2}}) MERGE (a)-[r:FUND_ALLOCATED{amount: {amountPara}}]->(b) RETURN a,b ",{nameParam1: name1, nameParam2: name2, amountPara: amount})
         .then(function(result){
-            res.redirect('/add?success=true');
+            res.redirect('/addDistrict?success=true');
+        })
+        .catch(function(error){
+            console.log(error);
+        });
+});
+
+//Allocate G to S
+app.post('/allocate/dtos', checkAuthenticated, function(req, res){
+    var name1 = req.body.name1;
+    var name2 = req.body.name2;
+    var amount = req.body.amount;
+
+    session
+        .run("MATCH(a:District_Gvt{name:{nameParam1}}), (b:School{name:{nameParam2}}) MERGE (a)-[r:FUND_DISBURSED{amount: {amountPara}}]->(b) RETURN a,b ",{nameParam1: name1, nameParam2: name2, amountPara: amount})
+        .then(function(result){
+            res.redirect('/addSchool?success=true');
         })
         .catch(function(error){
             console.log(error);
@@ -269,11 +461,13 @@ app.post('/allocate/gtos', checkAuthenticated, function(req, res){
 app.post('/school/vendor', checkAuthenticated, function(req, res){
     var name1 = req.body.name1;
     var name2 = req.body.name2;
+    var amount = req.body.amount;
 
     session
-        .run("MATCH(a:School{name:{nameParam1}}), (b:Vendor{name:{nameParam2}}) MERGE (a)-[r:FUND_DISBURSED]->(b) RETURN a,b ",{nameParam1: name1, nameParam2: name2})
+    .run("MATCH(a:School{name:{nameParam1}}), (b:Vendor{name:{nameParam2}}) MERGE (a)-[r:PAID{amount: {amountPara}}]->(b) RETURN a,b ",{nameParam1: name1, nameParam2: name2, amountPara: amount})
+
         .then(function(result){
-            res.redirect('/add?success=true');
+            res.redirect('/addVendor?success=true');
         })
         .catch(function(error){
             console.log(error);

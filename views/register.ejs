@@ -23,14 +23,19 @@
             <label for="name">Name</label>
             <input class="form-control" type="text" id="name" name="name" required> 
     
-            <label for="email">Email</label>
-            <input class="form-control" type="email" id="email" name="email" required> 
+            <label for="email">Username</label>
+            <input class="form-control" type="text" id="email" name="email" required> 
     
             <label for="password">Password</label>
             <input class="form-control" type="password" id="password" name="password" required> 
 
             <label for="type">Type</label>
-            <input class="form-control" type="text" id="type" name="type" required placeholder="Government or School"> 
+            <!-- <input class="form-control" type="text" id="type" name="type" required placeholder="Government or School">  -->
+            <select class="form-control"    name="type" id="type" required>
+              <option value="S_Gvt">State Government</option>
+              <option value="D_Gvt">District Government</option>
+              <option value="School">School</option>
+            </select>
 
             <br>
 
