@@ -48,10 +48,15 @@
         <div class="col-md-6">
             <p class="display-4" style="font-size:xx-large"><b>From school to vendor</b></p>
             <form id="gtosForm" method="POST" action="/school/vendor">
-                <div class="input-group mb-3">
-                    <div class="input-group">
+                <div class="row">
+                    <div class="rpw mt-3">
                         <input type="text" class="form-control" name="name1" value="<%= username %>" readonly>
                         <input type="text" class="form-control" name="amount" placeholder="Amount in Rupees.">
+                        <select name="project" id="project" class="form-control">
+                            <% projects.forEach(function(project){ %>
+                                <option value="<%= project.name %>"><%= project.name %></option>
+                            <% }) %>
+                        </select>
                         <select name="name2" id="name2" class="form-control">
                             <% vendors.forEach(function(vendor){ %>
                                   <option value="<%= vendor.name %>"><%= vendor.name %></option>

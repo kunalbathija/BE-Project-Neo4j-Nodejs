@@ -32,8 +32,10 @@
         <div class="col" style="margin-left: 5%;">
             <p class="display-4" style="font-size:xx-large"><b>Add New District Government</b></p>
             <form method="POST" action="/district/add">
-                <div class="input-group mb-3" style="width: 25rem;"> 
-                    <input type="text" class="form-control" name="name" placeholder="Name">
+                <div class="row" style="width: 25rem;"> 
+                    <input type="text" class="form-control" name="name" placeholder="District Name">
+                    <input type="text" class="form-control" name="email" placeholder="District Email">
+                    <input type="text" class="form-control" name="identity" placeholder="Identity Proof">
                     <div class="input-group-append">
                       <button class="btn btn-primary" type="submit" type="button">Submit</button>
                     </div>
