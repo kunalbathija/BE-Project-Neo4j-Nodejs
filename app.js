@@ -8,13 +8,24 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var neo4j = require('neo4j-driver');
-const bcrypt = require('bcrypt')
-const passport = require('passport')
-const flash = require('express-flash')
-const session1 = require('express-session')
-const methodOverride = require('method-override')
-
+const bcrypt = require('bcrypt');
+const passport = require('passport');
+const flash = require('express-flash');
+const session1 = require('express-session');
+const methodOverride = require('method-override');
+const uuid = require('uuid/v1')
+var nodemailer = require('nodemailer');
+var transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: 'test.sparrow.8688@gmail.com',
+      pass: 'Sparrow@8688'
+    }
+  });
 var app = express();
+
+const Blockchain = require('./block/blockchain')
+const blockchain = new Blockchain()
 
 const initializePassport = require('./passport-config')
 initializePassport(
@@ -35,7 +46,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: false}));
 app.use(flash())
 app.use(session1({
-    secret: process.env.SESSION_SECRET,
+    secret: 'dev',
     resave: false,
     saveUninitialized: false
 }))
@@ -56,7 +67,8 @@ var users = [
 ]
 
 app.get('/', checkNotAuthenticated, function(req, res){
-    res.redirect('index')
+    console.log(blockchain.getLastBlock());
+    res.redirect('index');
 });
 
 app.get('/login', checkNotAuthenticated, function(req, res){
@@ -116,22 +128,22 @@ app.post('/login', function(req, res, next) {
 
 //Home Route
 app.get('/index', checkAuthenticated, function(req, res){
+    console.log(blockchain.getUserData('Central Government'));
     session
-        .run("MATCH (n: State_Gvt) RETURN n")
+        .run("MATCH (n: Project) RETURN n")
         .then(function(result){
-            var governArr = [];
+            var projArr = [];
             result.records.forEach(function(record){
-                governArr.push({
+                projArr.push({
                     id: record._fields[0].identity.low,
                     name: record._fields[0].properties.name
                 });
                 //console.log(record._fields[0]);
             });
-        res.render('index', {
-            governs: governArr,
-            username: req.user.name
-        });
-            
+            res.render('index', {
+                projects: projArr,
+                username: req.user.name
+            });    
         })
         .catch(function(error){
             console.log(error);
@@ -140,7 +152,7 @@ app.get('/index', checkAuthenticated, function(req, res){
 
 //Get Add
 app.get('/add', checkAuthenticated, function(req, res){
-
+    console.log(blockchain.getUserData('Central Government'));
     var isAdded = req.query.success;
     if(isAdded){
         isAdded = true;
@@ -148,29 +160,39 @@ app.get('/add', checkAuthenticated, function(req, res){
         isAdded = false;
     }
 
-
     session
         .run("MATCH (n: State_Gvt) RETURN n")
-        .then(function(result){
-            var governArr = [];
+        .then(function(result){            
+            var governArr = [];    
             result.records.forEach(function(record){
                 governArr.push({
                     id: record._fields[0].identity.low,
                     name: record._fields[0].properties.name
                 });
                 //console.log(record._fields[0]);
-            });
-        res.render('add', {
-            governs: governArr,
-            isAdded : isAdded,
-            username: req.user.name
-        });
-            
+            });                    
+            session
+                .run("MATCH (n: Project) RETURN n")
+                .then(function(result1){    
+                    var projArr = [];        
+                    result1.records.forEach(function(record){
+                        projArr.push({
+                            id: record._fields[0].identity.low,
+                            name: record._fields[0].properties.name
+                        });
+                        //console.log(record._fields[0]);
+                    }); 
+                    res.render('add', {
+                        governs: governArr,
+                        projects: projArr,
+                        isAdded : isAdded,
+                        username: req.user.name
+                    });                   
+                })                
         })
         .catch(function(error){
             console.log(error);
-        });
-
+        });    
 });
 
 
@@ -205,7 +227,6 @@ app.get('/addDistrict', checkAuthenticated, function(req, res){
     }else{
         isAdded = false;
     }
-
     session
         .run("MATCH (n: District_Gvt) RETURN n")
         .then(function(result){
@@ -217,16 +238,28 @@ app.get('/addDistrict', checkAuthenticated, function(req, res){
                 });
             });
 
-        res.render('addDistrict', {
-            districts: districtsArr,
-            isAdded : isAdded,
-            username: req.user.name,
-        });    
-            
+            session
+                .run("MATCH (n: Project) RETURN n")
+                .then(function(result1){
+                    var projArr = [];
+                    result1.records.forEach(function(record){
+                        projArr.push({
+                            id: record._fields[0].identity.low,
+                            name: record._fields[0].properties.name
+                        });
+                        //console.log(record._fields[0]);
+                    });
+                    res.render('addDistrict', {
+                        projects: projArr,
+                        districts: districtsArr,
+                        isAdded : isAdded,
+                        username: req.user.name,
+                    });    
+                })            
         })
         .catch(function(error){
             console.log(error);
-        });
+        });    
 });
 
 app.get('/indexSchool', checkAuthenticated, function(req, res){
@@ -283,13 +316,24 @@ app.get('/addSchool', checkAuthenticated, function(req, res){
                     name: record._fields[0].properties.name
                 });
             });
-
-        res.render('addSchool', {
-            schools: schoolsArr,
-            isAdded : isAdded,
-            username: req.user.name,
-        });    
-            
+            session
+                .run("MATCH (n: Project) RETURN n")
+                .then(function(result1){
+                    var projArr = [];
+                    result1.records.forEach(function(record){
+                        projArr.push({
+                            id: record._fields[0].identity.low,
+                            name: record._fields[0].properties.name
+                        });
+                        //console.log(record._fields[0]);
+                    });
+                    res.render('addSchool', {
+                        projects: projArr,
+                        schools: schoolsArr,
+                        isAdded : isAdded,
+                        username: req.user.name,
+                    }); 
+                })                                   
         })
         .catch(function(error){
             console.log(error);
@@ -354,13 +398,59 @@ app.get('/indexVendor', checkAuthenticated, function(req, res){
         });
 });
 
+//Add Project
+app.post('/project/add', checkAuthenticated, function(req, res){
+    var name = req.body.name;
+    if(name){
+        session
+        .run("CREATE (n: Project{name: $nameParam}) RETURN n.name",{nameParam: name})
+        .then(function(result){
+            res.redirect('/index');
+        })
+        .catch(function(error){
+            console.log(error);
+        });
+    }    
+    else{
+        res.redirect('/index');
+    }
+});
+
 //Add Government Route
 app.post('/state/add', checkAuthenticated, function(req, res){
     var name = req.body.name;
-
+    var email = req.body.email;
+    var identity = req.body.identity;
+    // Add error handling for identity check
+    var password = uuid().split('-').join('').substr(0,8);
+    const found = users.some(el => el.email === email);
+    if(!found){
+        users.push({
+            id: uuid().split('-').join('').substr(0, 12), 
+            name: name, 
+            email: email, 
+            password: password, 
+            type: 'S_Gvt'
+        });
+        blockchain.createnewUser(name, 0);
+    }    
     session
-        .run("CREATE (n: State_Gvt{name: {nameParam}}) RETURN n.name",{nameParam: name})
+        .run("CREATE (n: State_Gvt{name: $nameParam, balance: 0}) RETURN n.name",{nameParam: name})
         .then(function(result){
+            var mailOptions = {
+                from: 'test.sparrow.8688@gmail.com',
+                to: email,
+                subject: 'Credentials for using Blockchain Network',
+                html: '<p>Following are the credentials for login:</p><br/><p>Email: ' + email + '</p><br/><p>Password: ' + password + '</p>',
+            };
+              
+            transporter.sendMail(mailOptions, function(error, info){
+                if (error) {
+                  console.log(error);
+                } else {
+                  console.log('Email sent: ' + info.response);
+                }
+            });
             res.redirect('/index');
         })
         .catch(function(error){
@@ -371,10 +461,38 @@ app.post('/state/add', checkAuthenticated, function(req, res){
 //Add District Government Route
 app.post('/district/add', checkAuthenticated, function(req, res){
     var name = req.body.name;
-
+    var email = req.body.email;
+    var identity = req.body.identity;
+    // Add error handling for identity check
+    var password = uuid().split('-').join('').substr(0,8);
+    const found = users.some(el => el.email === email);
+    if(!found){
+        users.push({
+            id: uuid().split('-').join('').substr(0, 12), 
+            name: name, 
+            email: email, 
+            password: password, 
+            type: 'D_Gvt'
+        });
+        blockchain.createnewUser(name, 0);
+    }
     session
-        .run("CREATE (n: District_Gvt{name: {nameParam}}) RETURN n.name",{nameParam: name})
+        .run("CREATE (n: District_Gvt{name: $nameParam, balance: 0}) RETURN n.name",{nameParam: name})
         .then(function(result){
+            var mailOptions = {
+                from: 'test.sparrow.8688@gmail.com',
+                to: email,
+                subject: 'Credentials for using Blockchain Network',
+                html: '<p>Following are the credentials for login:</p><br/><p>Email: ' + email + '</p><br/><p>Password: ' + password + '</p>',
+            };
+              
+            transporter.sendMail(mailOptions, function(error, info){
+                if (error) {
+                  console.log(error);
+                } else {
+                  console.log('Email sent: ' + info.response);
+                }
+            });
             res.redirect('/indexDistrict');
         })
         .catch(function(error){
@@ -384,10 +502,38 @@ app.post('/district/add', checkAuthenticated, function(req, res){
 
 app.post('/school/add', checkAuthenticated, function(req, res){
     var name = req.body.name;
-
+    var email = req.body.email;
+    var identity = req.body.identity;
+    // Add error handling for identity check
+    var password = uuid().split('-').join('').substr(0,8);
+    const found = users.some(el => el.email === email);
+    if(!found){
+        users.push({
+            id: uuid().split('-').join('').substr(0, 12), 
+            name: name, 
+            email: email, 
+            password: password, 
+            type: 'School'
+        });
+        blockchain.createnewUser(name, 0);
+    }
     session
-        .run("CREATE (n: School{name: {nameParam}}) RETURN n.name",{nameParam: name})
+        .run("CREATE (n: School{name: $nameParam, balance: 0}) RETURN n.name",{nameParam: name})
         .then(function(result){
+            var mailOptions = {
+                from: 'test.sparrow.8688@gmail.com',
+                to: email,
+                subject: 'Credentials for using Blockchain Network',
+                html: '<p>Following are the credentials for login:</p><br/><p>Email: ' + email + '</p><br/><p>Password: ' + password + '</p>',
+            };
+              
+            transporter.sendMail(mailOptions, function(error, info){
+                if (error) {
+                  console.log(error);
+                } else {
+                  console.log('Email sent: ' + info.response);
+                }
+            });
             res.redirect('/indexSchool');
         })
         .catch(function(error){
@@ -400,7 +546,7 @@ app.post('/vendor/add', checkAuthenticated, function(req, res){
     var name = req.body.name;
 
     session
-        .run("CREATE (n: Vendor{name: {nameParam}}) RETURN n.name",{nameParam: name})
+        .run("CREATE (n: Vendor{name: $nameParam}) RETURN n.name",{nameParam: name})
         .then(function(result){
             res.redirect('/indexSchool');
         })
@@ -409,17 +555,50 @@ app.post('/vendor/add', checkAuthenticated, function(req, res){
         });
 });
 
-//Allocate G to G
-app.post('/allocate/ctos', checkAuthenticated, function(req, res){
+//Allocate Central to State
+app.post('/allocate/ctos', checkAuthenticated, function(req, res){    
+    var sen = blockchain.getUserData(req.body.name1);    
+    // console.log(sen);
+    if(sen.balance < req.body.amount){
+        // Add error (Insufficient Balance)
+        console.log('Sender has Insufficient Balance');
+    }
+    
+    const newTrans = blockchain.createNewTransaction(req.body.amount, req.body.name1, req.body.name2, req.body.project);
+    blockchain.addTransactionToPendingTransactions(newTrans);
+    const lastBlock = blockchain.getLastBlock();
+	const previousBlockHash = lastBlock['hash'];
+	const currentBlockData = {
+		transactions: blockchain.pendingTransactions,
+		index: lastBlock['index'] + 1
+	};
+	const nonce = blockchain.proofOfWork(previousBlockHash, currentBlockData);
+	const blockHash = blockchain.hashBlock(previousBlockHash, currentBlockData, nonce);
+	const newBlock = blockchain.createNewBlock(nonce, previousBlockHash, blockHash);
+    console.log(blockchain.getLastBlock());
+    
     var name1 = req.body.name1;
     var name2 = req.body.name2;
     var amount = req.body.amount;
+    var project = req.body.project;
 
+    blockchain.updateUserSender(name1, amount);
+    blockchain.updateUserReceiver(name2, amount);
+    const sender = blockchain.getUserData(name1);
+    const receiver = blockchain.getUserData(name2);
     session
-        .run("MATCH(a:Central_Gvt{name:{nameParam1}}), (b:State_Gvt{name:{nameParam2}}) MERGE (a)-[r:FUND_ALLOCATED{amount: {amountPara}}]->(b) RETURN a,b ",{nameParam1: name1, nameParam2: name2, amountPara: amount})
-        .then(function(result){
-            res.redirect('/add?success=true');
-        })
+        .run("MATCH(a:Central_Gvt{name:$nameParam1}) SET a.balance = $senderBalance",{nameParam1: name1, senderBalance: sender.balance})
+        .then(function(result){            
+            session
+                .run("MATCH(a:State_Gvt{name:$nameParam2}) SET a.balance = $receiverBalance",{nameParam2: name2, receiverBalance: receiver.balance})    
+                .then(function(result1){
+                    session
+                    .run("MATCH(a:Central_Gvt{name:$nameParam1}), (b:State_Gvt{name:$nameParam2}) MERGE (a)-[r:" + project + "{amount: $amountPara}]->(b) RETURN a,b ",{nameParam1: name1, nameParam2: name2, amountPara: amount})
+                    .then(function(result2){
+                        res.redirect('/add?success=true');
+                    })
+                })
+        })        
         .catch(function(error){
             console.log(error);
         });
@@ -427,15 +606,49 @@ app.post('/allocate/ctos', checkAuthenticated, function(req, res){
 
 //Allocate G to G
 app.post('/allocate/stod', checkAuthenticated, function(req, res){
+    var sen = blockchain.getUserData(req.body.name1);    
+    // console.log(sen);
+    if(sen.balance < req.body.amount){
+        // Add error (Insufficient Balance)
+        console.log('Sender has Insufficient Balance');
+    }
+    
+    const newTrans = blockchain.createNewTransaction(req.body.amount, req.body.name1, req.body.name2, req.body.project);
+    blockchain.addTransactionToPendingTransactions(newTrans);
+    const lastBlock = blockchain.getLastBlock();
+	const previousBlockHash = lastBlock['hash'];
+	const currentBlockData = {
+		transactions: blockchain.pendingTransactions,
+		index: lastBlock['index'] + 1
+	};
+	const nonce = blockchain.proofOfWork(previousBlockHash, currentBlockData);
+	const blockHash = blockchain.hashBlock(previousBlockHash, currentBlockData, nonce);
+	const newBlock = blockchain.createNewBlock(nonce, previousBlockHash, blockHash);
+    console.log(blockchain.getLastBlock());
+
     var name1 = req.body.name1;
     var name2 = req.body.name2;
     var amount = req.body.amount;
+    var project = req.body.project;
+
+    blockchain.updateUserSender(name1, amount);
+    blockchain.updateUserReceiver(name2, amount);
+    const sender = blockchain.getUserData(name1);
+    const receiver = blockchain.getUserData(name2);
 
     session
-        .run("MATCH(a:State_Gvt{name:{nameParam1}}), (b:District_Gvt{name:{nameParam2}}) MERGE (a)-[r:FUND_ALLOCATED{amount: {amountPara}}]->(b) RETURN a,b ",{nameParam1: name1, nameParam2: name2, amountPara: amount})
+        .run("MATCH(a:State_Gvt{name:$nameParam1}) SET a.balance = $senderBalance",{nameParam1: name1, senderBalance: sender.balance})
         .then(function(result){
-            res.redirect('/addDistrict?success=true');
-        })
+            session
+                .run("MATCH(a:District_Gvt{name:$nameParam2}) SET a.balance = $receiverBalance",{nameParam2: name2, receiverBalance: receiver.balance})    
+                .then(function(result1){
+                    session
+                        .run("MATCH(a:State_Gvt{name:$nameParam1}), (b:District_Gvt{name:$nameParam2}) MERGE (a)-[r:" + project + "{amount: $amountPara}]->(b) RETURN a,b ",{nameParam1: name1, nameParam2: name2, amountPara: amount})
+                        .then(function(result){
+                            res.redirect('/addDistrict?success=true');
+                        })
+                })
+        })        
         .catch(function(error){
             console.log(error);
         });
@@ -443,15 +656,49 @@ app.post('/allocate/stod', checkAuthenticated, function(req, res){
 
 //Allocate G to S
 app.post('/allocate/dtos', checkAuthenticated, function(req, res){
+    var sen = blockchain.getUserData(req.body.name1);    
+    // console.log(sen);
+    if(sen.balance < req.body.amount){
+        // Add error (Insufficient Balance)
+        console.log('Sender has Insufficient Balance');
+    }
+    
+    const newTrans = blockchain.createNewTransaction(req.body.amount, req.body.name1, req.body.name2, req.body.project);
+    blockchain.addTransactionToPendingTransactions(newTrans);
+    const lastBlock = blockchain.getLastBlock();
+	const previousBlockHash = lastBlock['hash'];
+	const currentBlockData = {
+		transactions: blockchain.pendingTransactions,
+		index: lastBlock['index'] + 1
+	};
+	const nonce = blockchain.proofOfWork(previousBlockHash, currentBlockData);
+	const blockHash = blockchain.hashBlock(previousBlockHash, currentBlockData, nonce);
+	const newBlock = blockchain.createNewBlock(nonce, previousBlockHash, blockHash);
+    console.log(blockchain.getLastBlock());
+
     var name1 = req.body.name1;
     var name2 = req.body.name2;
     var amount = req.body.amount;
+    var project = req.body.project;
+
+    blockchain.updateUserSender(name1, amount);
+    blockchain.updateUserReceiver(name2, amount);
+    const sender = blockchain.getUserData(name1);
+    const receiver = blockchain.getUserData(name2);
 
     session
-        .run("MATCH(a:District_Gvt{name:{nameParam1}}), (b:School{name:{nameParam2}}) MERGE (a)-[r:FUND_DISBURSED{amount: {amountPara}}]->(b) RETURN a,b ",{nameParam1: name1, nameParam2: name2, amountPara: amount})
+        .run("MATCH(a:District_Gvt{name:$nameParam1}) SET a.balance = $senderBalance",{nameParam1: name1, senderBalance: sender.balance})
         .then(function(result){
-            res.redirect('/addSchool?success=true');
-        })
+            session
+                .run("MATCH(a:School{name:$nameParam2}) SET a.balance = $receiverBalance",{nameParam2: name2, receiverBalance: receiver.balance})    
+                .then(function(result1){
+                    session
+                        .run("MATCH(a:District_Gvt{name:$nameParam1}), (b:School{name:$nameParam2}) MERGE (a)-[r:" + project + "{amount: $amountPara}]->(b) RETURN a,b ",{nameParam1: name1, nameParam2: name2, amountPara: amount})
+                        .then(function(result2){
+                            res.redirect('/addSchool?success=true');2
+                        })
+                })
+        })                
         .catch(function(error){
             console.log(error);
         });
@@ -464,7 +711,7 @@ app.post('/school/vendor', checkAuthenticated, function(req, res){
     var amount = req.body.amount;
 
     session
-    .run("MATCH(a:School{name:{nameParam1}}), (b:Vendor{name:{nameParam2}}) MERGE (a)-[r:PAID{amount: {amountPara}}]->(b) RETURN a,b ",{nameParam1: name1, nameParam2: name2, amountPara: amount})
+    .run("MATCH(a:School{name:$nameParam1}), (b:Vendor{name:$nameParam2}) MERGE (a)-[r:PAID{amount: $amountPara}]->(b) RETURN a,b ",{nameParam1: name1, nameParam2: name2, amountPara: amount})
 
         .then(function(result){
             res.redirect('/addVendor?success=true');

@@ -47,10 +47,15 @@
           <div class="col-md-6">
               <p class="display-4" style="font-size:xx-large"><b>Allocate Funds to District</b></p>
               <form id="gtogForm" method="POST" action="/allocate/stod">
-                  <div class="input-group mb-3">
-                      <div class="input-group">
-                          <input type="text" class="form-control" name="name1" value="<%= username.split(' ')[0] %>" readonly="readonly" >
+                  <div class="row mt-3">
+                      <div class="row">
+                          <input type="text" class="form-control" name="name1" value="<%= username %>" readonly="readonly">
                           <input type="text" class="form-control" name="amount" placeholder="Amount in Rupees.">
+                          <select name="project" id="project" class="form-control">
+                            <% projects.forEach(function(project){ %>
+                                <option value="<%= project.name %>"><%= project.name %></option>
+                            <% }) %>
+                          </select>
                           <select name="name2" id="name2" class="form-control">
                             <% districts.forEach(function(district){ %>
                                   <option value="<%= district.name %>"><%= district.name %></option>
