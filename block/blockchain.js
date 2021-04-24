@@ -70,6 +70,10 @@ class Blockchain {
 		return this.chain[this.chain.length - 1];
 	}
 
+	getAllBlocks(){
+		return this.chain;
+	}
+
 	createNewTransaction(amount, sender, recipient, project) {
 		const newTransaction = {
 			amount,

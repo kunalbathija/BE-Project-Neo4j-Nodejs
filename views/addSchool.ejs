@@ -40,6 +40,8 @@
 <div style="margin: 2.5%;">
     <h3 class="display-4" style="text-align: center;">Allocation & Tracking of Public Funds using Blockchain</h3>
     <h6 style="text-align: center;">User Type: District Government</h6>
+    <h6 style="text-align: center;">Balance: Rs. <%= districtBalance %></h6>
+
     <br>
     <br>
     <div class="row">
@@ -50,7 +52,7 @@
               <div class="row">
                   <div class="input-group row mt-3">
                       <input type="text" class="form-control" name="name1" value="<%= username %>" readonly="readonly" >
-                      <input type="text" class="form-control" name="amount" placeholder="Amount in Rupees.">
+                      <input type="number" max="<%= districtBalance %>" class="form-control" name="amount" placeholder="Amount in Rupees.">
                       <select name="project" id="project" class="form-control">
                         <% projects.forEach(function(project){ %>
                             <option value="<%= project.name %>"><%= project.name %></option>
