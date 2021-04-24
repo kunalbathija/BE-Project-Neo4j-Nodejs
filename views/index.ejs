@@ -37,12 +37,30 @@
                 <div class="input-group mb-3" style="width: 25rem;"> 
                     <input type="text" class="form-control" name="name" placeholder="Project Name">
                     <div class="input-group-append">
-                      <button class="btn btn-primary" type="submit" type="button">Submit</button>
+                      <button class="btn btn-primary" type="submit" type="button">Add</button>
                     </div>
                 </div>
             </form>
         </div>
         <div class="col">
+            <p class="display-4" style="font-size:xx-large"><b>Add New State</b></p>
+            <form method="POST" action="/state/add">
+                <!-- <input type="text" name="name" placeholder="Name">
+                <button type="submit" class="btn btn-primary">Submit</button> -->
+                <div class="row input-group"> 
+                    <input type="text" class="form-control" name="name" placeholder="State Name">
+                    <input type="text" class="form-control" name="email" placeholder="State Email">
+                    <input type="text" class="form-control" name="identity" placeholder="Identity Proof">
+                    <div class="input-group-append" style="float: right;">
+                      <button class="btn btn-primary" type="submit" type="button">Add</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="row align-items-start">
+        <div class="col" style="margin-left: 5%;">
+            
             <p class="display-4" style="font-size:xx-large"><b>List of Projects</b></p>
             <div class="card" style="width: 25rem;">
                 <ul class="list-group list-group-flush">
@@ -52,22 +70,15 @@
                 </ul>
             </div>
         </div>
-    </div>
-    <div class="row align-items-start">
-        <div class="col" style="margin-left: 5%;">
-            <p class="display-4" style="font-size:xx-large"><b>Add New State</b></p>
-            <form method="POST" action="/state/add">
-                <!-- <input type="text" name="name" placeholder="Name">
-                <button type="submit" class="btn btn-primary">Submit</button> -->
-                <div class="row" style="width: 25rem;"> 
-                    <input type="text" class="form-control" name="name" placeholder="State Name">
-                    <input type="text" class="form-control" name="email" placeholder="State Email">
-                    <input type="text" class="form-control" name="identity" placeholder="Identity Proof">
-                    <div class="input-group-append">
-                      <button class="btn btn-primary" type="submit" type="button">Submit</button>
-                    </div>
-                </div>
-            </form>
+        <div class="col">
+            <p class="display-4" style="font-size:xx-large"><b>List of States</b></p>
+            <div class="card" style="width: 25rem;">
+                <ul class="list-group list-group-flush">
+                    <% states.forEach(function(state){ %>
+                        <li class="list-group-item lead"><%= state.name %></li>
+                    <% }) %>
+                </ul>
+            </div>
         </div>
     </div>
     <br>
