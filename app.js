@@ -66,6 +66,8 @@ var users = [
     // { id: '1613226927112', name: 'PQR School', email: 'PQR_School', password: '123456', type: 'School'}
 ]
 
+var blockchain_transactions = blockchain.getAllBlocks();
+
 app.get('/', checkNotAuthenticated, function(req, res){
     console.log(blockchain.getLastBlock());
     res.redirect('index');
@@ -125,11 +127,19 @@ app.post('/login', function(req, res, next) {
     })(req, res, next);
 });
 
+app.get('/transactions', checkAuthenticated, function(req, res){
+
+    blockchain_transactions = blockchain.getAllBlocks();
+    console.log(blockchain_transactions);
+    res.render('transactions', {
+        username: req.user.name,
+        blockchain_transactions: blockchain_transactions
+    }); 
+});
 
 //Home Route
 app.get('/index', checkAuthenticated, function(req, res){
     console.log(blockchain.getUserData('Central Government'));
-
     session
         .run("MATCH (n: Project) RETURN n")
         .then(function(result){            
@@ -155,7 +165,8 @@ app.get('/index', checkAuthenticated, function(req, res){
                     res.render('index', {
                         states: stateArr,
                         projects: projArr,
-                        username: req.user.name
+                        username: req.user.name,
+                        blockchain_transactions: blockchain_transactions
                     });                   
                 })                
         })
