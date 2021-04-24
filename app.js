@@ -129,25 +129,39 @@ app.post('/login', function(req, res, next) {
 //Home Route
 app.get('/index', checkAuthenticated, function(req, res){
     console.log(blockchain.getUserData('Central Government'));
+
     session
         .run("MATCH (n: Project) RETURN n")
-        .then(function(result){
-            var projArr = [];
+        .then(function(result){            
+            var projArr = [];    
             result.records.forEach(function(record){
                 projArr.push({
                     id: record._fields[0].identity.low,
                     name: record._fields[0].properties.name
                 });
                 //console.log(record._fields[0]);
-            });
-            res.render('index', {
-                projects: projArr,
-                username: req.user.name
-            });    
+            });                    
+            session
+                .run("MATCH (n: State_Gvt) RETURN n")
+                .then(function(result1){    
+                    var stateArr = [];        
+                    result1.records.forEach(function(record){
+                        stateArr.push({
+                            id: record._fields[0].identity.low,
+                            name: record._fields[0].properties.name
+                        });
+                        //console.log(stateArr);
+                    }); 
+                    res.render('index', {
+                        states: stateArr,
+                        projects: projArr,
+                        username: req.user.name
+                    });                   
+                })                
         })
         .catch(function(error){
             console.log(error);
-        });
+        }); 
 });
 
 //Get Add
@@ -182,12 +196,26 @@ app.get('/add', checkAuthenticated, function(req, res){
                         });
                         //console.log(record._fields[0]);
                     }); 
-                    res.render('add', {
-                        governs: governArr,
-                        projects: projArr,
-                        isAdded : isAdded,
-                        username: req.user.name
-                    });                   
+                    session
+                        .run("MATCH (n: Central_Gvt) RETURN n")
+                        .then(function(result1){    
+                            var centralArr = [];        
+                            result1.records.forEach(function(record){
+                                centralArr.push({
+                                    id: record._fields[0].identity.low,
+                                    name: record._fields[0].properties.name,
+                                    balance: record._fields[0].properties.balance
+                                });
+                                //console.log(centralArr[0].balance);
+                            }); 
+                            res.render('add', {
+                                governs: governArr,
+                                centralGvt: centralArr,
+                                projects: projArr,
+                                isAdded : isAdded,
+                                username: req.user.name
+                            });                   
+                        })                    
                 })                
         })
         .catch(function(error){
@@ -423,17 +451,19 @@ app.post('/state/add', checkAuthenticated, function(req, res){
     var identity = req.body.identity;
     // Add error handling for identity check
     var password = uuid().split('-').join('').substr(0,8);
+    console.log("password",password)
     const found = users.some(el => el.email === email);
     if(!found){
         users.push({
             id: uuid().split('-').join('').substr(0, 12), 
             name: name, 
             email: email, 
-            password: password, 
+            password: '123456', 
             type: 'S_Gvt'
         });
         blockchain.createnewUser(name, 0);
     }    
+    console.log(users);
     session
         .run("CREATE (n: State_Gvt{name: $nameParam, balance: 0}) RETURN n.name",{nameParam: name})
         .then(function(result){
@@ -465,13 +495,14 @@ app.post('/district/add', checkAuthenticated, function(req, res){
     var identity = req.body.identity;
     // Add error handling for identity check
     var password = uuid().split('-').join('').substr(0,8);
+    console.log(password)
     const found = users.some(el => el.email === email);
     if(!found){
         users.push({
             id: uuid().split('-').join('').substr(0, 12), 
             name: name, 
             email: email, 
-            password: password, 
+            password: '123456', 
             type: 'D_Gvt'
         });
         blockchain.createnewUser(name, 0);
@@ -512,7 +543,7 @@ app.post('/school/add', checkAuthenticated, function(req, res){
             id: uuid().split('-').join('').substr(0, 12), 
             name: name, 
             email: email, 
-            password: password, 
+            password: '123456', 
             type: 'School'
         });
         blockchain.createnewUser(name, 0);

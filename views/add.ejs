@@ -40,17 +40,17 @@
 <div style="margin: 2.5%;">
     <h3 class="display-4" style="text-align: center;">Allocation & Tracking of Public Funds using Blockchain</h3>
     <h6 style="text-align: center;">User Type: Government</h6>
+    <h6 style="text-align: center;">Balance: Rs. <%= centralGvt[0].balance %></h6>
     <br>
     <br>
     <div class="row">
-        <div class="col-md-3"></div>
-        <div class="col-md-6">
+        <div class="col-md-1"></div>
+        <div class="col-md-10">
             <p class="display-4" style="font-size:xx-large"><b>Allocate Funds to State</b></p>
             <form id="gtogForm" method="POST" action="/allocate/ctos">
                 <div class="input-group mb-3">
-                    <div class="input-group">
                         <input type="text" class="form-control" name="name1" value="Central Government" readonly="readonly" >
-                        <input type="text" class="form-control" name="amount" placeholder="Amount in Rupees.">
+                        <input type="number" class="form-control" max="<%= centralGvt[0].balance %>" name="amount" placeholder="Amount">
                         <select name="project" id="project" class="form-control">
                             <% projects.forEach(function(project){ %>
                                 <option value="<%= project.name %>"><%= project.name %></option>
@@ -64,7 +64,6 @@
                         <div class="input-group-append">
                             <button class="btn btn-primary" type="submit" type="button">Submit</button>
                         </div>
-                    </div>
                 </div>
             </form>
         </div>
