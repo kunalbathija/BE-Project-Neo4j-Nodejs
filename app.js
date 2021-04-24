@@ -59,11 +59,11 @@ var driver = neo4j.driver("bolt://localhost", neo4j.auth.basic("neo4j", "123456"
 var session = driver.session()
 
 var users = [
-    { id: '1613226927108', name: 'Central Government', email: 'central_government', password: '123456', type: 'C_Gvt'},
-    { id: '1613226927109', name: 'Maharashtra State Government', email: 'maha_state_government', password: '123456', type: 'S_Gvt'},
-    { id: '1613226927110', name: 'Mumbai District Government', email: 'mumbai_district_government', password: '123456', type: 'D_Gvt'},
-    { id: '1613226927111', name: 'ABC School', email: 'ABC_School', password: '123456', type: 'School'},
-    { id: '1613226927112', name: 'PQR School', email: 'PQR_School', password: '123456', type: 'School'}
+    { id: '1613226927108', name: 'Central Government', email: 'central_government', password: '123456', type: 'C_Gvt'}
+    // { id: '1613226927109', name: 'Maharashtra State Government', email: 'maha_state_government', password: '123456', type: 'S_Gvt'},
+    // { id: '1613226927110', name: 'Mumbai District Government', email: 'mumbai_district_government', password: '123456', type: 'D_Gvt'},
+    // { id: '1613226927111', name: 'ABC School', email: 'ABC_School', password: '123456', type: 'School'},
+    // { id: '1613226927112', name: 'PQR School', email: 'PQR_School', password: '123456', type: 'School'}
 ]
 
 app.get('/', checkNotAuthenticated, function(req, res){
@@ -275,14 +275,21 @@ app.get('/addDistrict', checkAuthenticated, function(req, res){
                             id: record._fields[0].identity.low,
                             name: record._fields[0].properties.name
                         });
-                        //console.log(record._fields[0]);
                     });
-                    res.render('addDistrict', {
-                        projects: projArr,
-                        districts: districtsArr,
-                        isAdded : isAdded,
-                        username: req.user.name,
-                    });    
+                    session
+                    .run("MATCH (n: State_Gvt {name: $State_name}) RETURN n",{State_name: req.user.name})
+                    .then(function(result1){
+                        result1.records.forEach(function(record){
+                            stateBalance = record._fields[0].properties.balance
+                        });
+                        res.render('addDistrict', {
+                            projects: projArr,
+                            districts: districtsArr,
+                            isAdded : isAdded,
+                            username: req.user.name,
+                            stateBalance: stateBalance
+                        });    
+                    })  
                 })            
         })
         .catch(function(error){
@@ -353,14 +360,22 @@ app.get('/addSchool', checkAuthenticated, function(req, res){
                             id: record._fields[0].identity.low,
                             name: record._fields[0].properties.name
                         });
-                        //console.log(record._fields[0]);
                     });
-                    res.render('addSchool', {
-                        projects: projArr,
-                        schools: schoolsArr,
-                        isAdded : isAdded,
-                        username: req.user.name,
-                    }); 
+                    session
+                        .run("MATCH (n: District_Gvt {name: $District_name}) RETURN n",{District_name: req.user.name})
+                        .then(function(result1){
+                            result1.records.forEach(function(record){
+                                districtBalance = record._fields[0].properties.balance
+                            });
+                            res.render('addSchool', {
+                                projects: projArr,
+                                schools: schoolsArr,
+                                isAdded : isAdded,
+                                username: req.user.name,
+                                districtBalance: districtBalance
+                            });     
+                        })
+                    
                 })                                   
         })
         .catch(function(error){
@@ -387,13 +402,32 @@ app.get('/addVendor', checkAuthenticated, function(req, res){
                     name: record._fields[0].properties.name
                 });
             });
-
-            res.render('addVendor', {
-                isAdded : isAdded,
-                username: req.user.name,
-                vendors: vendorsArr
-                
-            });
+            session
+                .run("MATCH (n: Project) RETURN n")
+                .then(function(result1){
+                    var projArr = [];
+                    result1.records.forEach(function(record){
+                        projArr.push({
+                            id: record._fields[0].identity.low,
+                            name: record._fields[0].properties.name
+                        });
+                    });
+                    session
+                    .run("MATCH (n: School {name: $School_name}) RETURN n",{School_name: req.user.name})
+                    .then(function(result1){
+                        result1.records.forEach(function(record){
+                            schoolBalance = record._fields[0].properties.balance
+                        });
+                        res.render('addVendor', {
+                            projects: projArr,
+                            isAdded : isAdded,
+                            username: req.user.name,
+                            vendors: vendorsArr,
+                            schoolBalance: schoolBalance
+                        });  
+                    })  
+                })   
+            
         })
         .catch(function(error){
             console.log(error);

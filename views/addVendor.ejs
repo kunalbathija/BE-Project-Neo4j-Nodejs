@@ -40,6 +40,8 @@
 <div style="margin: 2.5%;">
     <h3 class="display-4" style="text-align: center;">Allocation & Tracking of Public Funds using Blockchain</h3>
     <h6 style="text-align: center;">User Type: School</h6>
+    <h6 style="text-align: center;">Balance: Rs. <%= schoolBalance %></h6>
+
     <br>
     <br>
     <div id='status' class='invisible'><%= isAdded %></div>
@@ -49,9 +51,9 @@
             <p class="display-4" style="font-size:xx-large"><b>From school to vendor</b></p>
             <form id="gtosForm" method="POST" action="/school/vendor">
                 <div class="row">
-                    <div class="rpw mt-3">
+                    <div class="input-group row mt-3">
                         <input type="text" class="form-control" name="name1" value="<%= username %>" readonly>
-                        <input type="text" class="form-control" name="amount" placeholder="Amount in Rupees.">
+                        <input type="number" max="<%= schoolBalance %>" class="form-control" name="amount" placeholder="Amount in Rupees.">
                         <select name="project" id="project" class="form-control">
                             <% projects.forEach(function(project){ %>
                                 <option value="<%= project.name %>"><%= project.name %></option>
