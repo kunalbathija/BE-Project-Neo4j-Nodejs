@@ -620,10 +620,39 @@ app.post('/school/add', checkAuthenticated, function(req, res){
 //Add vendor 
 app.post('/vendor/add', checkAuthenticated, function(req, res){
     var name = req.body.name;
+    var email = req.body.email;
+    var identity = req.body.identity;
+    // Add error handling for identity check
+    var password = uuid().split('-').join('').substr(0,8);
+    const found = users.some(el => el.email === email);
+    if(!found){
+        users.push({
+            id: uuid().split('-').join('').substr(0, 12), 
+            name: name, 
+            email: email, 
+            password: '123456', 
+            type: 'Vendor'
+        });
+        blockchain.createnewUser(name, 0);
+    }
 
     session
         .run("CREATE (n: Vendor{name: $nameParam}) RETURN n.name",{nameParam: name})
         .then(function(result){
+            var mailOptions = {
+                from: 'test.sparrow.8688@gmail.com',
+                to: email,
+                subject: 'Credentials for using Blockchain Network',
+                html: '<p>Following are the credentials for login:</p><br/><p>Email: ' + email + '</p><br/><p>Password: ' + password + '</p>',
+            };
+              
+            transporter.sendMail(mailOptions, function(error, info){
+                if (error) {
+                  console.log(error);
+                } else {
+                  console.log('Email sent: ' + info.response);
+                }
+            });
             res.redirect('/indexSchool');
         })
         .catch(function(error){
@@ -771,7 +800,7 @@ app.post('/allocate/dtos', checkAuthenticated, function(req, res){
                     session
                         .run("MATCH(a:District_Gvt{name:$nameParam1}), (b:School{name:$nameParam2}) MERGE (a)-[r:" + project + "{amount: $amountPara}]->(b) RETURN a,b ",{nameParam1: name1, nameParam2: name2, amountPara: amount})
                         .then(function(result2){
-                            res.redirect('/addSchool?success=true');2
+                            res.redirect('/addSchool?success=true');
                         })
                 })
         })                
@@ -782,19 +811,51 @@ app.post('/allocate/dtos', checkAuthenticated, function(req, res){
 
 //School to vendor 
 app.post('/school/vendor', checkAuthenticated, function(req, res){
+    var sen = blockchain.getUserData(req.body.name1);    
+    // console.log(sen);
+    if(sen.balance < req.body.amount){
+        // Add error (Insufficient Balance)
+        console.log('Sender has Insufficient Balance');
+    }
+    
+    const newTrans = blockchain.createNewTransaction(req.body.amount, req.body.name1, req.body.name2, req.body.project);
+    blockchain.addTransactionToPendingTransactions(newTrans);
+    const lastBlock = blockchain.getLastBlock();
+	const previousBlockHash = lastBlock['hash'];
+	const currentBlockData = {
+		transactions: blockchain.pendingTransactions,
+		index: lastBlock['index'] + 1
+	};
+	const nonce = blockchain.proofOfWork(previousBlockHash, currentBlockData);
+	const blockHash = blockchain.hashBlock(previousBlockHash, currentBlockData, nonce);
+	const newBlock = blockchain.createNewBlock(nonce, previousBlockHash, blockHash);
+    console.log(blockchain.getLastBlock());
+    
     var name1 = req.body.name1;
     var name2 = req.body.name2;
+    var project = req.body.project;
     var amount = req.body.amount;
+    blockchain.updateUserSender(name1, amount);
+    blockchain.updateUserReceiver(name2, amount);
+    const sender = blockchain.getUserData(name1);
+    const receiver = blockchain.getUserData(name2);
 
     session
-    .run("MATCH(a:School{name:$nameParam1}), (b:Vendor{name:$nameParam2}) MERGE (a)-[r:PAID{amount: $amountPara}]->(b) RETURN a,b ",{nameParam1: name1, nameParam2: name2, amountPara: amount})
-
+        .run("MATCH(a:School{name:$nameParam1}) SET a.balance = $senderBalance",{nameParam1: name1, senderBalance: sender.balance})
         .then(function(result){
-            res.redirect('/addVendor?success=true');
-        })
+            session
+                .run("MATCH(a:Vendor{name:$nameParam2}) SET a.balance = $receiverBalance",{nameParam2: name2, receiverBalance: receiver.balance})    
+                .then(function(result1){
+                    session
+                    .run("MATCH(a:School{name:$nameParam1}), (b:Vendor{name:$nameParam2}) MERGE (a)-[r:" + project + "{amount: $amountPara}]->(b) RETURN a,b ",{nameParam1: name1, nameParam2: name2, amountPara: amount})
+                        .then(function(result2){
+                            res.redirect('/addVendor?success=true');
+                        })
+                })
+        })                
         .catch(function(error){
             console.log(error);
-        });
+        });        
 });
 
 app.get('/graph', function(req, res){
