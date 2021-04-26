@@ -40,17 +40,24 @@
 <div style="margin: 2.5%;">
     <h3 class="display-4" style="text-align: center;">Allocation & Tracking of Public Funds using Blockchain</h3>
     <h6 style="text-align: center;">User Type: District Government</h6>
+    <h6 style="text-align: center;">Balance: Rs. <%= districtBalance %></h6>
+
     <br>
     <br>
     <div class="row">
-      <div class="col-md-3"></div>
-      <div class="col-md-6">
+      <div class="col-md-1"></div>
+      <div class="col-md-10">
           <p class="display-4" style="font-size:xx-large"><b>Allocate Funds to School</b></p>
           <form id="gtogForm" method="POST" action="/allocate/dtos">
-              <div class="input-group mb-3">
-                  <div class="input-group">
-                      <input type="text" class="form-control" name="name1" value="<%= username.split(' ')[0] %>" readonly="readonly" >
-                      <input type="text" class="form-control" name="amount" placeholder="Amount in Rupees.">
+              <div class="row">
+                  <div class="input-group row mt-3">
+                      <input type="text" class="form-control" name="name1" value="<%= username %>" readonly="readonly" >
+                      <input type="number" max="<%= districtBalance %>" class="form-control" name="amount" placeholder="Amount in Rupees.">
+                      <select name="project" id="project" class="form-control">
+                        <% projects.forEach(function(project){ %>
+                            <option value="<%= project.name %>"><%= project.name %></option>
+                        <% }) %>
+                      </select>
                       <select name="name2" id="name2" class="form-control">
                         <% schools.forEach(function(school){ %>
                               <option value="<%= school.name %>"><%= school.name %></option>

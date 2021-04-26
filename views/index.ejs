@@ -3,7 +3,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">  
 </head>
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark"">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <a class="navbar-brand" href="/index">B.E. Project</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -13,6 +13,7 @@
         <a class="nav-item nav-link active" href="/index">Home  <span class="sr-only">(current)</span></a>
         <a class="nav-item nav-link" href="/add">Allocate funds</a>
         <a class="nav-item nav-link" href="/graph">Fund Tracking</a>
+        <a class="nav-item nav-link" href="/transactions">Blockchain Transactions</a>
       </div>
     </div>
     <ul class="nav navbar-nav ml-auto">
@@ -30,30 +31,58 @@
     <br>
     <div class="row align-items-start">
         <div class="col" style="margin-left: 5%;">
-            <p class="display-4" style="font-size:xx-large"><b>Add New State Government</b></p>
-            <form method="POST" action="/state/add">
+            <p class="display-4" style="font-size:xx-large"><b>Add New Project</b></p>
+            <form method="POST" action="/project/add">
                 <!-- <input type="text" name="name" placeholder="Name">
                 <button type="submit" class="btn btn-primary">Submit</button> -->
                 <div class="input-group mb-3" style="width: 25rem;"> 
-                    <input type="text" class="form-control" name="name" placeholder="Name">
+                    <input type="text" class="form-control" name="name" placeholder="Project Name">
                     <div class="input-group-append">
-                      <button class="btn btn-primary" type="submit" type="button">Submit</button>
+                      <button class="btn btn-primary" type="submit" type="button">Add</button>
                     </div>
                 </div>
             </form>
         </div>
         <div class="col">
-            <p class="display-4" style="font-size:xx-large"><b>List of State Governments</b></p>
+            <p class="display-4" style="font-size:xx-large"><b>Add New State</b></p>
+            <form method="POST" action="/state/add">
+                <!-- <input type="text" name="name" placeholder="Name">
+                <button type="submit" class="btn btn-primary">Submit</button> -->
+                <div class="row input-group"> 
+                    <input type="text" class="form-control" name="name" placeholder="State Name">
+                    <input type="text" class="form-control" name="email" placeholder="State Email">
+                    <input type="text" class="form-control" name="identity" placeholder="Identity Proof">
+                    <div class="input-group-append" style="float: right;">
+                      <button class="btn btn-primary" type="submit" type="button">Add</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="row align-items-start">
+        <div class="col" style="margin-left: 5%;">
+            
+            <p class="display-4" style="font-size:xx-large"><b>List of Projects</b></p>
             <div class="card" style="width: 25rem;">
                 <ul class="list-group list-group-flush">
-                    <% governs.forEach(function(govern){ %>
-                        <li class="list-group-item lead"><%= govern.name %></li>
+                    <% projects.forEach(function(project){ %>
+                        <li class="list-group-item lead"><%= project.name %></li>
                     <% }) %>
                 </ul>
             </div>
         </div>
-
+        <div class="col">
+            <p class="display-4" style="font-size:xx-large"><b>List of States</b></p>
+            <div class="card" style="width: 25rem;">
+                <ul class="list-group list-group-flush">
+                    <% states.forEach(function(state){ %>
+                        <li class="list-group-item lead"><%= state.name %></li>
+                    <% }) %>
+                </ul>
+            </div>
+        </div>
     </div>
+    
     <br>
     
 </div>
