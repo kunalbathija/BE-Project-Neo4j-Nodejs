@@ -1,2 +1,9 @@
 .env
 node_modules
+
+bower_components
+issues.txt
+node_modules
+.DS_Store
+*.map
+

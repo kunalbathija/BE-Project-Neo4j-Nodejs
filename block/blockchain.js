@@ -15,7 +15,7 @@ class Blockchain {
 	createnewUser(name, balance){
 		const newUser = {			
 			name: name,						
-			balance: balance
+			balance: parseInt(balance)
 		};
 		this.users.push(newUser);		
 	}
@@ -34,8 +34,8 @@ class Blockchain {
 		for (var i = 0; i < this.users.length; i++) {
 			var obj = this.users[i];
 			if(obj.name == name){
-				var curr = obj.balance
-				obj.balance = curr - amount;
+				var curr = parseInt(obj.balance)
+				obj.balance = curr - parseInt(amount);
 			}
 		}		
 	}
@@ -44,8 +44,8 @@ class Blockchain {
 		for (var i = 0; i < this.users.length; i++) {
 			var obj = this.users[i];
 			if(obj.name == name){
-				var curr = obj.balance
-				obj.balance = curr + amount;				
+				var curr = parseInt(obj.balance)
+				obj.balance = curr + parseInt(amount);				
 			}
 		}		
 	}
@@ -72,6 +72,10 @@ class Blockchain {
 
 	getAllBlocks(){
 		return this.chain;
+	}
+
+	getAllUsers(){
+		return this.users;
 	}
 
 	createNewTransaction(amount, sender, recipient, project) {
