@@ -18,8 +18,8 @@ var nodemailer = require('nodemailer');
 var transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: 'test.sparrow.8688@gmail.com',
-      pass: 'Sparrow@8688'
+      user: 'vestudizteam@gmail.com',
+      pass: 'lebrqyloiectreud'
     }
   });
 var app = express();
@@ -37,6 +37,8 @@ initializePassport(
 //view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
+
+app.use(express.static(__dirname + '/views'));
 
 app.use(logger('dev'));
 app.use(bodyParser.json());
@@ -59,7 +61,7 @@ var driver = neo4j.driver("bolt://localhost", neo4j.auth.basic("neo4j", "123456"
 var session = driver.session()
 
 var users = [
-    { id: '1613226927108', name: 'Central Government', email: 'central_government', password: '123456', type: 'C_Gvt'}
+    { id: '1613226927108', name: 'Central Government', email: 'central_gvt@yopmail.com', password: '123456', type: 'C_Gvt'}
     // { id: '1613226927109', name: 'Maharashtra State Government', email: 'maha_state_government', password: '123456', type: 'S_Gvt'},
     // { id: '1613226927110', name: 'Mumbai District Government', email: 'mumbai_district_government', password: '123456', type: 'D_Gvt'},
     // { id: '1613226927111', name: 'ABC School', email: 'ABC_School', password: '123456', type: 'School'},
@@ -620,39 +622,41 @@ app.post('/school/add', checkAuthenticated, function(req, res){
 //Add vendor 
 app.post('/vendor/add', checkAuthenticated, function(req, res){
     var name = req.body.name;
-    var email = req.body.email;
-    var identity = req.body.identity;
-    // Add error handling for identity check
-    var password = uuid().split('-').join('').substr(0,8);
-    const found = users.some(el => el.email === email);
-    if(!found){
-        users.push({
-            id: uuid().split('-').join('').substr(0, 12), 
-            name: name, 
-            email: email, 
-            password: '123456', 
-            type: 'Vendor'
-        });
-        blockchain.createnewUser(name, 0);
-    }
+    // var email = req.body.email;
+    // var identity = req.body.identity;
+    // // Add error handling for identity check
+    // var password = uuid().split('-').join('').substr(0,8);
+    // const found = users.some(el => el.email === email);
+    // if(!found){
+    //     users.push({
+    //         id: uuid().split('-').join('').substr(0, 12), 
+    //         name: name, 
+    //         email: email, 
+    //         password: '123456', 
+    //         type: 'Vendor'
+    //     });
+    //     
+    // }
+
+    blockchain.createnewUser(name, 0);
 
     session
-        .run("CREATE (n: Vendor{name: $nameParam}) RETURN n.name",{nameParam: name})
+        .run("CREATE (n: Vendor{name: $nameParam, balance: 0}) RETURN n.name",{nameParam: name})
         .then(function(result){
-            var mailOptions = {
-                from: 'test.sparrow.8688@gmail.com',
-                to: email,
-                subject: 'Credentials for using Blockchain Network',
-                html: '<p>Following are the credentials for login:</p><br/><p>Email: ' + email + '</p><br/><p>Password: ' + password + '</p>',
-            };
+            // var mailOptions = {
+            //     from: 'test.sparrow.8688@gmail.com',
+            //     to: email,
+            //     subject: 'Credentials for using Blockchain Network',
+            //     html: '<p>Following are the credentials for login:</p><br/><p>Email: ' + email + '</p><br/><p>Password: ' + password + '</p>',
+            // };
               
-            transporter.sendMail(mailOptions, function(error, info){
-                if (error) {
-                  console.log(error);
-                } else {
-                  console.log('Email sent: ' + info.response);
-                }
-            });
+            // transporter.sendMail(mailOptions, function(error, info){
+            //     if (error) {
+            //       console.log(error);
+            //     } else {
+            //       console.log('Email sent: ' + info.response);
+            //     }
+            // });
             res.redirect('/indexSchool');
         })
         .catch(function(error){
@@ -839,6 +843,9 @@ app.post('/school/vendor', checkAuthenticated, function(req, res){
     blockchain.updateUserReceiver(name2, amount);
     const sender = blockchain.getUserData(name1);
     const receiver = blockchain.getUserData(name2);
+    const users = blockchain.getAllUsers();
+    console.log(users);
+    console.log(receiver);
 
     session
         .run("MATCH(a:School{name:$nameParam1}) SET a.balance = $senderBalance",{nameParam1: name1, senderBalance: sender.balance})
@@ -858,8 +865,8 @@ app.post('/school/vendor', checkAuthenticated, function(req, res){
         });        
 });
 
-app.get('/graph', function(req, res){
-    res.render('graph')
+app.get('/graph', checkAuthenticated,  function(req, res){
+    res.render('neo4j_graph')
 });
 
 
