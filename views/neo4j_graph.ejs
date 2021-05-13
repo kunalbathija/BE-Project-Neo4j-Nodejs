@@ -22,7 +22,8 @@
         <a class="nav-item nav-link" href="/index">Home</a>
         <a class="nav-item nav-link" href="/add">Allocate Funds <span class="sr-only">(current)</span></a>
         <a class="nav-item nav-link active" href="/graph">Fund Tracking</a>
-        <a class="nav-item nav-link" href="/transactions">Blockchain Transactions</a>
+        <a class="nav-item nav-link" href="/department_transactions">Transactions</a>
+        <a class="nav-item nav-link" href="/transactions">Blockchain</a>
 
       </div>
     </div>
@@ -40,7 +41,7 @@
       <input type="hidden" class="form-control" value="http://localhost:7474" id="neo4jUrl"/><br/>
       <input type="hidden" class="form-control" size="8" value="neo4j" id="neo4jUser"/>
       <input type="hidden" class="form-control" size="8" placeholder="password" value="123456" id="neo4jPass"/><br/>
-      <input type="hidden" hidden="hidden" style="display: none !important;" name="cypher" id="cypher" class="form-control" value="MATCH (n)-[r]->(m)  RETURN n,r,m  LIMIT 50;"/>
+      <input type="hidden" class="form-control" hidden="hidden" style="display: none !important;" name="cypher" id="cypher" value="MATCH (n)-[r]->(m)  RETURN n,r,m  LIMIT 50;"/>
       </div>
     
     <div role="tabpanel">

@@ -1,0 +1,71 @@
+<head>
+    <title>BE Project</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">  
+</head>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <a class="navbar-brand" href="/index">B.E. Project</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+      <div class="navbar-nav">
+        <a class="nav-item nav-link" href="/index">Home</a>
+        <a class="nav-item nav-link" href="/add">Allocate funds</a>
+        <a class="nav-item nav-link" href="/graph">Fund Tracking</a>
+        <a class="nav-item nav-link active" href="/department_transactions">Transactions <span class="sr-only">(current)</span></a>        
+      </div>
+    </div>
+    <ul class="nav navbar-nav ml-auto">
+        <a class="nav-item nav-link" >Hello, <%= username %></a>
+        <form class="form-inline" action="/logout?_method=DELETE" method="POST">
+            <button class="btn btn-outline-danger" type="submit">Logout</button>
+          </form>
+    </ul>
+</nav>
+
+<div style="margin: 2.5%;">
+    <p class="display-4" style="font-size: medium,"><b>Select Project</b></p>
+    <form method="POST" action="/getTransactions">
+        <div class="input-group mb-3" style="width: 50%;"> 
+            <select name="project" id="project" class="form-control">
+                <% projects.forEach(function(project){ %>
+                    <option value="<%= project.name %>"><%= project.name %></option>
+                <% }) %>
+            </select>
+            <div class="input-group-append">
+                <button class="btn btn-primary" type="submit" type="button">Submit</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div style="margin: 2.5%;">
+<table class="table table-bordered">
+<thead>
+    <tr>
+        <th scope="col">Sender</th>
+        <th scope="col">Receiver</th>
+        <th scope="col">Project</th>
+        <th scope="col">Amount</th>
+        <th scope="col">Transaction Id</th>
+    </tr>
+</thead>
+<tbody>
+    <% if(department_transactions != []){ %>
+        <% department_transactions.forEach(function(transaction){ %>
+            <tr>
+                <td ><%= transaction.sender %></td>
+                <td ><%= transaction.recipient %></td>
+                <td ><%= transaction.project %></td>
+                <td ><%= transaction.amount %></td>
+                <td ><%= transaction.transactionId %></td>                            
+            </tr>
+        <% }) %>
+    <% } %>
+    
+</tbody>
+</table>
+
+
+</div>

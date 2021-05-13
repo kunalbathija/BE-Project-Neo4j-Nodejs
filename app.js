@@ -139,126 +139,82 @@ app.get('/transactions', checkAuthenticated, function(req, res){
     }); 
 });
 
+app.post('/getTransactions', checkAuthenticated, function(req, res){
+    var search = req.body.project;
+    var blocks = blockchain.getAllBlocks();
+    var proj_trans = [];
+    var projects = blockchain.getAllProjects();
+    for(var i = 0; i < blocks.length; i++){
+        if(blocks[i].transactions.length != 0){
+            if(req.user.name == 'Central Government'){
+                if(blocks[i].transactions[0].project == search){
+                    proj_trans.push(blockchain_transactions[i].transactions[0])    
+                }    
+            }
+            else{
+                if(blocks[i].transactions[0].project == search && (blocks[i].transactions[0].sender == req.user.name || blocks[i].transactions[0].recipient == req.user.name)){
+                    proj_trans.push(blocks[i].transactions[0])
+                }
+            }            
+        }
+    }
+    res.render('department_transactions', {
+        username: req.user.name,
+        department_transactions: proj_trans,
+        projects: projects
+    }); 
+})
+
+app.get('/department_transactions', checkAuthenticated, function(req, res){
+    var projects = blockchain.getAllProjects();
+    res.render('department_transactions', {
+        username: req.user.name,
+        department_transactions: [],
+        projects: projects
+    }); 
+});
+
 //Home Route
 app.get('/index', checkAuthenticated, function(req, res){
-    console.log(blockchain.getUserData('Central Government'));
-    session
-        .run("MATCH (n: Project) RETURN n")
-        .then(function(result){            
-            var projArr = [];    
-            result.records.forEach(function(record){
-                projArr.push({
-                    id: record._fields[0].identity.low,
-                    name: record._fields[0].properties.name
-                });
-                //console.log(record._fields[0]);
-            });                    
-            session
-                .run("MATCH (n: State_Gvt) RETURN n")
-                .then(function(result1){    
-                    var stateArr = [];        
-                    result1.records.forEach(function(record){
-                        stateArr.push({
-                            id: record._fields[0].identity.low,
-                            name: record._fields[0].properties.name
-                        });
-                        //console.log(stateArr);
-                    }); 
-                    res.render('index', {
-                        states: stateArr,
-                        projects: projArr,
-                        username: req.user.name,
-                        blockchain_transactions: blockchain_transactions
-                    });                   
-                })                
-        })
-        .catch(function(error){
-            console.log(error);
-        }); 
+    console.log(blockchain.getUserDataByName('Central Government'));
+    var projArr = blockchain.getAllProjects();
+    var stateArr = blockchain.getUsersByType('S_Gvt');
+    res.render('index', {
+        states: stateArr,
+        projects: projArr,
+        username: req.user.name        
+    }); 
 });
 
 //Get Add
 app.get('/add', checkAuthenticated, function(req, res){
-    console.log(blockchain.getUserData('Central Government'));
+    console.log(blockchain.getUserDataByName('Central Government'));
     var isAdded = req.query.success;
     if(isAdded){
         isAdded = true;
     }else{
         isAdded = false;
     }
-
-    session
-        .run("MATCH (n: State_Gvt) RETURN n")
-        .then(function(result){            
-            var governArr = [];    
-            result.records.forEach(function(record){
-                governArr.push({
-                    id: record._fields[0].identity.low,
-                    name: record._fields[0].properties.name
-                });
-                //console.log(record._fields[0]);
-            });                    
-            session
-                .run("MATCH (n: Project) RETURN n")
-                .then(function(result1){    
-                    var projArr = [];        
-                    result1.records.forEach(function(record){
-                        projArr.push({
-                            id: record._fields[0].identity.low,
-                            name: record._fields[0].properties.name
-                        });
-                        //console.log(record._fields[0]);
-                    }); 
-                    session
-                        .run("MATCH (n: Central_Gvt) RETURN n")
-                        .then(function(result1){    
-                            var centralArr = [];        
-                            result1.records.forEach(function(record){
-                                centralArr.push({
-                                    id: record._fields[0].identity.low,
-                                    name: record._fields[0].properties.name,
-                                    balance: record._fields[0].properties.balance
-                                });
-                                //console.log(centralArr[0].balance);
-                            }); 
-                            res.render('add', {
-                                governs: governArr,
-                                centralGvt: centralArr,
-                                projects: projArr,
-                                isAdded : isAdded,
-                                username: req.user.name
-                            });                   
-                        })                    
-                })                
-        })
-        .catch(function(error){
-            console.log(error);
-        });    
+    var governArr = blockchain.getUsersByType('S_Gvt');
+    var projArr = blockchain.getAllProjects();
+    var centralArr = [blockchain.getUserDataByName('Central Government')];
+    res.render('add', {
+        governs: governArr,
+        centralGvt: centralArr,
+        projects: projArr,
+        isAdded : isAdded,
+        username: req.user.name
+    });
 });
 
 
 
 app.get('/indexDistrict', checkAuthenticated, function(req, res){
-    session
-        .run("MATCH (n: District_Gvt) RETURN n")
-        .then(function(result){
-            var districtsArr = [];
-            result.records.forEach(function(record){
-                districtsArr.push({
-                    id: record._fields[0].identity.low,
-                    name: record._fields[0].properties.name
-                });
-            });
-
-        res.render('indexDistrict', {
-            districts: districtsArr,
-            username: req.user.name,
-        });    
-            
-        })
-        .catch(function(error){
-            console.log(error);
-        });
+    var districtsArr = blockchain.getUsersByType('D_Gvt');
+    res.render('indexDistrict', {
+        districts: districtsArr,
+        username: req.user.name,
+    });
 });
 
 app.get('/addDistrict', checkAuthenticated, function(req, res){
@@ -268,82 +224,27 @@ app.get('/addDistrict', checkAuthenticated, function(req, res){
     }else{
         isAdded = false;
     }
-    session
-        .run("MATCH (n: District_Gvt) RETURN n")
-        .then(function(result){
-            var districtsArr = [];
-            result.records.forEach(function(record){
-                districtsArr.push({
-                    id: record._fields[0].identity.low,
-                    name: record._fields[0].properties.name
-                });
-            });
 
-            session
-                .run("MATCH (n: Project) RETURN n")
-                .then(function(result1){
-                    var projArr = [];
-                    result1.records.forEach(function(record){
-                        projArr.push({
-                            id: record._fields[0].identity.low,
-                            name: record._fields[0].properties.name
-                        });
-                    });
-                    session
-                    .run("MATCH (n: State_Gvt {name: $State_name}) RETURN n",{State_name: req.user.name})
-                    .then(function(result1){
-                        result1.records.forEach(function(record){
-                            stateBalance = record._fields[0].properties.balance
-                        });
-                        res.render('addDistrict', {
-                            projects: projArr,
-                            districts: districtsArr,
-                            isAdded : isAdded,
-                            username: req.user.name,
-                            stateBalance: stateBalance
-                        });    
-                    })  
-                })            
-        })
-        .catch(function(error){
-            console.log(error);
-        });    
+    var districtsArr = blockchain.getUsersByType('D_Gvt');
+    var projArr = blockchain.getAllProjects();
+    var stateBalance = blockchain.getUserDataByName(req.user.name).balance;
+    res.render('addDistrict', {
+        projects: projArr,
+        districts: districtsArr,
+        isAdded : isAdded,
+        username: req.user.name,
+        stateBalance: stateBalance
+    }); 
 });
 
 app.get('/indexSchool', checkAuthenticated, function(req, res){
-    session
-    .run("MATCH (n: School) RETURN n")
-        .then(function(result){
-            var schoolsArr = [];
-            result.records.forEach(function(record){
-                schoolsArr.push({
-                    id: record._fields[0].identity.low,
-                    name: record._fields[0].properties.name
-                });
-            });
-
-            session
-                .run("MATCH (n: Vendor) RETURN n")
-                .then(function(result2){
-                    var vendorsArr = [];
-                    result2.records.forEach(function(record){
-                        vendorsArr.push({
-                            id: record._fields[0].identity.low,
-                            name: record._fields[0].properties.name
-                        });
-                    });
-
-                    res.render('indexSchool', {
-                        schools: schoolsArr,
-                        vendors: vendorsArr,
-                        username: req.user.name,
-                    });
-                })
-            
-        })
-        .catch(function(error){
-            console.log(error);
-        });
+    var schoolsArr = blockchain.getUsersByType('School');
+    var vendorsArr = blockchain.getUsersByType('Vendor');
+    res.render('indexSchool', {
+        schools: schoolsArr,
+        vendors: vendorsArr,
+        username: req.user.name,
+    });
 });
 
 app.get('/addSchool', checkAuthenticated, function(req, res){
@@ -353,129 +254,51 @@ app.get('/addSchool', checkAuthenticated, function(req, res){
     }else{
         isAdded = false;
     }
-
-    session
-        .run("MATCH (n: School) RETURN n")
-        .then(function(result){
-            var schoolsArr = [];
-            result.records.forEach(function(record){
-                schoolsArr.push({
-                    id: record._fields[0].identity.low,
-                    name: record._fields[0].properties.name
-                });
-            });
-            session
-                .run("MATCH (n: Project) RETURN n")
-                .then(function(result1){
-                    var projArr = [];
-                    result1.records.forEach(function(record){
-                        projArr.push({
-                            id: record._fields[0].identity.low,
-                            name: record._fields[0].properties.name
-                        });
-                    });
-                    session
-                        .run("MATCH (n: District_Gvt {name: $District_name}) RETURN n",{District_name: req.user.name})
-                        .then(function(result1){
-                            result1.records.forEach(function(record){
-                                districtBalance = record._fields[0].properties.balance
-                            });
-                            res.render('addSchool', {
-                                projects: projArr,
-                                schools: schoolsArr,
-                                isAdded : isAdded,
-                                username: req.user.name,
-                                districtBalance: districtBalance
-                            });     
-                        })
-                    
-                })                                   
-        })
-        .catch(function(error){
-            console.log(error);
-        });
+    var schoolsArr = blockchain.getUsersByType('School');
+    var projArr = blockchain.getAllProjects();
+    var districtBalance = blockchain.getUserDataByName(req.user.name).balance;
+    res.render('addSchool', {
+        projects: projArr,
+        schools: schoolsArr,
+        isAdded : isAdded,
+        username: req.user.name,
+        districtBalance: districtBalance
+    });         
 });
 
 //Get AddVendor
 app.get('/addVendor', checkAuthenticated, function(req, res){
-
     var isAdded = req.query.success;
     if(isAdded){
         isAdded = true;
     }else{
         isAdded = false;
     }
-    session
-        .run("MATCH (n: Vendor) RETURN n")
-        .then(function(result2){
-            var vendorsArr = [];
-            result2.records.forEach(function(record){
-                vendorsArr.push({
-                    id: record._fields[0].identity.low,
-                    name: record._fields[0].properties.name
-                });
-            });
-            session
-                .run("MATCH (n: Project) RETURN n")
-                .then(function(result1){
-                    var projArr = [];
-                    result1.records.forEach(function(record){
-                        projArr.push({
-                            id: record._fields[0].identity.low,
-                            name: record._fields[0].properties.name
-                        });
-                    });
-                    session
-                    .run("MATCH (n: School {name: $School_name}) RETURN n",{School_name: req.user.name})
-                    .then(function(result1){
-                        result1.records.forEach(function(record){
-                            schoolBalance = record._fields[0].properties.balance
-                        });
-                        res.render('addVendor', {
-                            projects: projArr,
-                            isAdded : isAdded,
-                            username: req.user.name,
-                            vendors: vendorsArr,
-                            schoolBalance: schoolBalance
-                        });  
-                    })  
-                })   
-            
-        })
-        .catch(function(error){
-            console.log(error);
-        });
-
+    var vendorsArr = blockchain.getUsersByType('Vendor');
+    var projArr = blockchain.getAllProjects();
+    var schoolBalance = blockchain.getUserDataByName(req.user.name).balance;
+    res.render('addVendor', {
+        projects: projArr,
+        isAdded : isAdded,
+        username: req.user.name,
+        vendors: vendorsArr,
+        schoolBalance: schoolBalance
+    });  
 });
 
 
 app.get('/indexVendor', checkAuthenticated, function(req, res){
-    session
-        .run("MATCH (n: Vendor) RETURN n")
-        .then(function(result){
-            var vendorsArr = [];
-            result.records.forEach(function(record){
-                vendorsArr.push({
-                    id: record._fields[0].identity.low,
-                    name: record._fields[0].properties.name
-                });
-                //console.log(record._fields[0]);
-            });
-
-        res.render('indexVendor', {
-            vendors: vendorsArr,
-            username: req.user.name,
-        });    
-            
-        })
-        .catch(function(error){
-            console.log(error);
-        });
+    var vendorsArr = blockchain.getUsersByType('Vendor');
+    res.render('indexVendor', {
+        vendors: vendorsArr,
+        username: req.user.name,
+    });        
 });
 
 //Add Project
 app.post('/project/add', checkAuthenticated, function(req, res){
     var name = req.body.name;
+    blockchain.createNewProject(name);
     if(name){
         session
         .run("CREATE (n: Project{name: $nameParam}) RETURN n.name",{nameParam: name})
@@ -508,7 +331,7 @@ app.post('/state/add', checkAuthenticated, function(req, res){
             password: '123456', 
             type: 'S_Gvt'
         });
-        blockchain.createnewUser(name, 0);
+        blockchain.createNewUser(name, 0, 'S_Gvt');
     }    
     console.log(users);
     session
@@ -552,7 +375,7 @@ app.post('/district/add', checkAuthenticated, function(req, res){
             password: '123456', 
             type: 'D_Gvt'
         });
-        blockchain.createnewUser(name, 0);
+        blockchain.createNewUser(name, 0, 'D_Gvt');
     }
     session
         .run("CREATE (n: District_Gvt{name: $nameParam, balance: 0}) RETURN n.name",{nameParam: name})
@@ -593,7 +416,7 @@ app.post('/school/add', checkAuthenticated, function(req, res){
             password: '123456', 
             type: 'School'
         });
-        blockchain.createnewUser(name, 0);
+        blockchain.createNewUser(name, 0, 'School');
     }
     session
         .run("CREATE (n: School{name: $nameParam, balance: 0}) RETURN n.name",{nameParam: name})
@@ -638,7 +461,7 @@ app.post('/vendor/add', checkAuthenticated, function(req, res){
     //     
     // }
 
-    blockchain.createnewUser(name, 0);
+    blockchain.createNewUser(name, 0, 'Vendor');
 
     session
         .run("CREATE (n: Vendor{name: $nameParam, balance: 0}) RETURN n.name",{nameParam: name})
@@ -666,7 +489,7 @@ app.post('/vendor/add', checkAuthenticated, function(req, res){
 
 //Allocate Central to State
 app.post('/allocate/ctos', checkAuthenticated, function(req, res){    
-    var sen = blockchain.getUserData(req.body.name1);    
+    var sen = blockchain.getUserDataByName(req.body.name1);    
     // console.log(sen);
     if(sen.balance < req.body.amount){
         // Add error (Insufficient Balance)
@@ -693,8 +516,8 @@ app.post('/allocate/ctos', checkAuthenticated, function(req, res){
 
     blockchain.updateUserSender(name1, amount);
     blockchain.updateUserReceiver(name2, amount);
-    const sender = blockchain.getUserData(name1);
-    const receiver = blockchain.getUserData(name2);
+    const sender = blockchain.getUserDataByName(name1);
+    const receiver = blockchain.getUserDataByName(name2);
     session
         .run("MATCH(a:Central_Gvt{name:$nameParam1}) SET a.balance = $senderBalance",{nameParam1: name1, senderBalance: sender.balance})
         .then(function(result){            
@@ -715,7 +538,7 @@ app.post('/allocate/ctos', checkAuthenticated, function(req, res){
 
 //Allocate G to G
 app.post('/allocate/stod', checkAuthenticated, function(req, res){
-    var sen = blockchain.getUserData(req.body.name1);    
+    var sen = blockchain.getUserDataByName(req.body.name1);    
     // console.log(sen);
     if(sen.balance < req.body.amount){
         // Add error (Insufficient Balance)
@@ -742,8 +565,8 @@ app.post('/allocate/stod', checkAuthenticated, function(req, res){
 
     blockchain.updateUserSender(name1, amount);
     blockchain.updateUserReceiver(name2, amount);
-    const sender = blockchain.getUserData(name1);
-    const receiver = blockchain.getUserData(name2);
+    const sender = blockchain.getUserDataByName(name1);
+    const receiver = blockchain.getUserDataByName(name2);
 
     session
         .run("MATCH(a:State_Gvt{name:$nameParam1}) SET a.balance = $senderBalance",{nameParam1: name1, senderBalance: sender.balance})
@@ -765,7 +588,7 @@ app.post('/allocate/stod', checkAuthenticated, function(req, res){
 
 //Allocate G to S
 app.post('/allocate/dtos', checkAuthenticated, function(req, res){
-    var sen = blockchain.getUserData(req.body.name1);    
+    var sen = blockchain.getUserDataByName(req.body.name1);    
     // console.log(sen);
     if(sen.balance < req.body.amount){
         // Add error (Insufficient Balance)
@@ -792,8 +615,8 @@ app.post('/allocate/dtos', checkAuthenticated, function(req, res){
 
     blockchain.updateUserSender(name1, amount);
     blockchain.updateUserReceiver(name2, amount);
-    const sender = blockchain.getUserData(name1);
-    const receiver = blockchain.getUserData(name2);
+    const sender = blockchain.getUserDataByName(name1);
+    const receiver = blockchain.getUserDataByName(name2);
 
     session
         .run("MATCH(a:District_Gvt{name:$nameParam1}) SET a.balance = $senderBalance",{nameParam1: name1, senderBalance: sender.balance})
@@ -815,7 +638,7 @@ app.post('/allocate/dtos', checkAuthenticated, function(req, res){
 
 //School to vendor 
 app.post('/school/vendor', checkAuthenticated, function(req, res){
-    var sen = blockchain.getUserData(req.body.name1);    
+    var sen = blockchain.getUserDataByName(req.body.name1);    
     // console.log(sen);
     if(sen.balance < req.body.amount){
         // Add error (Insufficient Balance)
@@ -841,8 +664,8 @@ app.post('/school/vendor', checkAuthenticated, function(req, res){
     var amount = req.body.amount;
     blockchain.updateUserSender(name1, amount);
     blockchain.updateUserReceiver(name2, amount);
-    const sender = blockchain.getUserData(name1);
-    const receiver = blockchain.getUserData(name2);
+    const sender = blockchain.getUserDataByName(name1);
+    const receiver = blockchain.getUserDataByName(name2);
     const users = blockchain.getAllUsers();
     console.log(users);
     console.log(receiver);
