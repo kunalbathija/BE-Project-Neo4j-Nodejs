@@ -5,22 +5,31 @@ class Blockchain {
 	constructor() {
 		this.chain = [];
 		this.users = [];
+		this.projects = [];
 		this.pendingTransactions = [];
 		// this.currentNodeUrl = currentNodeUrl;
 		this.networkNodes = [];	
-		this.createnewUser('Central Government', 10000)
+		this.createNewUser('Central Government', 10000, 'C_Gvt')
 		this.createNewBlock(100, '0', '0'); // Genesis Block
 	}
 
-	createnewUser(name, balance){
+	createNewProject(name){
+		const newProj = {
+			name: name,
+		};
+		this.projects.push(newProj);
+	}
+
+	createNewUser(name, balance, type){
 		const newUser = {			
 			name: name,						
-			balance: parseInt(balance)
+			balance: parseInt(balance),
+			type: type
 		};
 		this.users.push(newUser);		
 	}
 
-	getUserData(name){
+	getUserDataByName(name){
 		for (var i = 0; i < this.users.length; i++) {
 			var obj = this.users[i];
 			if(obj.name == name){
@@ -28,6 +37,17 @@ class Blockchain {
 			}
 		}
 		return null;
+	}
+
+	getUsersByType(type){
+		var data = []
+		for (var i = 0; i < this.users.length; i++) {
+			var obj = this.users[i];
+			if(obj.type == type){
+				data.push(obj);
+			}
+		}
+		return data ? data : null;
 	}
 
 	updateUserSender(name, amount){
@@ -76,6 +96,10 @@ class Blockchain {
 
 	getAllUsers(){
 		return this.users;
+	}
+
+	getAllProjects(){
+		return this.projects;
 	}
 
 	createNewTransaction(amount, sender, recipient, project) {
